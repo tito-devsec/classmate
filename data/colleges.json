@@ -1,0 +1,192 @@
+[
+  {
+    "id": "c3",
+    "name": "CBE (College of Business Education)",
+    "location": "Ilala, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 1500000,
+    "tuitionMax": 3500000,
+    "type": "Private",
+    "category": "College",
+    "programs": [
+      "Accountancy",
+      "Marketing",
+      "Procurement",
+      "HR Management"
+    ],
+    "description": "Chuo bora cha biashara kinachotoa elimu ya kitaaluma na vitendo.",
+    "facilities": [
+      "Maktaba",
+      "ICT Lab",
+      "Lecture Halls",
+      "Canteen"
+    ],
+    "phone": "+255 222 150 177",
+    "email": "info@cbe.ac.tz",
+    "image": "college-cbe",
+    "rating": 4.3
+  },
+  {
+    "id": "c4",
+    "name": "IFM (Institute of Finance Management)",
+    "location": "Shaaban Robert St, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 2000000,
+    "tuitionMax": 4500000,
+    "type": "Private",
+    "category": "Institute",
+    "programs": [
+      "Finance",
+      "Insurance",
+      "Banking",
+      "Accounting",
+      "IT"
+    ],
+    "description": "Taasisi inayoongoza kwa masomo ya fedha, bima na benki Tanzania.",
+    "facilities": [
+      "Maktaba ya Kisasa",
+      "Computer Labs",
+      "Auditorium",
+      "Hosteli"
+    ],
+    "phone": "+255 222 211 2931",
+    "email": "info@ifm.ac.tz",
+    "image": "college-ifm",
+    "rating": 4.5
+  },
+  {
+    "id": "c6",
+    "name": "DIT (Dar es Salaam Institute of Technology)",
+    "location": "Ilala, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 1200000,
+    "tuitionMax": 3000000,
+    "type": "Private",
+    "category": "Institute",
+    "programs": [
+      "Civil Engineering",
+      "Electrical Engineering",
+      "Mechanical Engineering",
+      "IT"
+    ],
+    "description": "Taasisi ya teknolojia inayotoa mafunzo ya ufundi na uhandisi.",
+    "facilities": [
+      "Workshops",
+      "Maabara",
+      "Maktaba",
+      "Uwanja wa Michezo"
+    ],
+    "phone": "+255 222 215 0174",
+    "email": "info@dit.ac.tz",
+    "image": "college-dit",
+    "rating": 4.2
+  },
+  {
+    "id": "c13",
+    "name": "NIT (National Institute of Transport)",
+    "location": "Ubungo, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 1500000,
+    "tuitionMax": 3500000,
+    "type": "Private",
+    "category": "Institute",
+    "programs": [
+      "Transport Management",
+      "Logistics",
+      "Clearing & Forwarding",
+      "IT"
+    ],
+    "description": "Taasisi maalum kwa masomo ya usafiri, logistics na usafirishaji.",
+    "facilities": [
+      "Maktaba",
+      "Computer Labs",
+      "Lecture Halls",
+      "Hosteli"
+    ],
+    "phone": "+255 222 282 0041",
+    "email": "info@nit.ac.tz",
+    "image": "college-nit",
+    "rating": 4.1
+  },
+  {
+    "id": "c14",
+    "name": "TIA (Tanzania Institute of Accountancy)",
+    "location": "Ilala, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 1200000,
+    "tuitionMax": 3000000,
+    "type": "Private",
+    "category": "Institute",
+    "programs": [
+      "Accountancy",
+      "Finance",
+      "Taxation",
+      "Business Administration"
+    ],
+    "description": "Taasisi ya hesabu na fedha inayotoa programu za stashahada na shahada.",
+    "facilities": [
+      "Maktaba",
+      "ICT Lab",
+      "Lecture Halls",
+      "Canteen"
+    ],
+    "phone": "+255 222 211 5001",
+    "email": "info@tia.ac.tz",
+    "image": "college-tia",
+    "rating": 4
+  },
+  {
+    "id": "c15",
+    "name": "VETA Dar es Salaam",
+    "location": "Chang'ombe, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 500000,
+    "tuitionMax": 1500000,
+    "type": "Private",
+    "category": "College",
+    "programs": [
+      "Electrical",
+      "Motor Vehicle",
+      "Welding",
+      "Tailoring",
+      "Plumbing"
+    ],
+    "description": "Chuo cha ufundi kinachotoa mafunzo ya vitendo katika fani mbalimbali za ufundi.",
+    "facilities": [
+      "Workshops",
+      "Maabara",
+      "Hosteli",
+      "Canteen"
+    ],
+    "phone": "+255 222 286 3805",
+    "email": "info@veta.go.tz",
+    "image": "college-veta",
+    "rating": 4
+  },
+  {
+    "id": "c16",
+    "name": "TIBS (Tanzania Institute of Business Studies)",
+    "location": "Kinondoni, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 1000000,
+    "tuitionMax": 2500000,
+    "type": "Private",
+    "category": "College",
+    "programs": [
+      "Business Administration",
+      "IT",
+      "Marketing",
+      "Human Resources"
+    ],
+    "description": "Chuo binafsi cha biashara kinachotoa elimu ya kitaaluma kwa bei nafuu.",
+    "facilities": [
+      "Maktaba",
+      "Computer Labs",
+      "Lecture Halls"
+    ],
+    "phone": "+255 222 277 3301",
+    "email": "info@tibs.ac.tz",
+    "image": "college-tibs",
+    "rating": 3.9
+  }
+]

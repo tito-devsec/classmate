@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Editorial light-grey canvas, white cards, one deep crimson accent. */
+    --background: 40 14% 96%;
+    --foreground: 0 0% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
+
+    --primary: 347 72% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    /* The near-black used by the search bar and dark panels. */
+    --secondary: 0 0% 7%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 40 10% 92%;
+    --muted-foreground: 0 0% 42%;
+
+    --accent: 347 72% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 46%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 8% 88%;
+    --input: 40 8% 88%;
+    --ring: 347 72% 40%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 8%;
+    --sidebar-primary: 347 72% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 10% 94%;
+    --sidebar-accent-foreground: 0 0% 8%;
+    --sidebar-border: 40 8% 88%;
+    --sidebar-ring: 347 72% 40%;
+
+    --hero-gradient: linear-gradient(135deg, hsl(0, 0%, 9%) 0%, hsl(347, 60%, 22%) 100%);
+    --success: 152 45% 30%;
+    --success-foreground: 0 0% 100%;
+    --warm-bg: 40 14% 96%;
+    --warm-bg-darker: 40 12% 92%;
+    --cta: 347 72% 40%;
+    --cta-foreground: 0 0% 100%;
+
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 40 10% 94%;
+    --card: 0 0% 11%;
+    --card-foreground: 40 10% 94%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 40 10% 94%;
+    --primary: 347 72% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 8%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 64%;
+    --accent: 347 72% 52%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 347 72% 52%;
+    --sidebar-background: 0 0% 9%;
+    --sidebar-foreground: 40 10% 94%;
+    --sidebar-primary: 347 72% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 40 10% 94%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 347 72% 52%;
+    --hero-gradient: linear-gradient(135deg, hsl(0, 0%, 6%) 0%, hsl(347, 50%, 18%) 100%);
+    --warm-bg: 0 0% 9%;
+    --warm-bg-darker: 0 0% 12%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    @apply tracking-tight;
+  }
+
+  /* The display face carries the page: tight tracking, heavy weight, short leading. */
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  .hero-gradient {
+    background: var(--hero-gradient);
+  }
+
+  .warm-section {
+    background-color: hsl(var(--warm-bg));
+  }
+
+  .text-gradient-primary {
+    background: var(--hero-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Editorial headline scale used by the hero and every section title. */
+  .display-xl {
+    @apply font-display font-extrabold leading-[1.04] tracking-[-0.03em];
+    font-size: clamp(2.25rem, 6.2vw, 4.5rem);
+  }
+
+  .display-lg {
+    @apply font-display font-extrabold leading-[1.06] tracking-[-0.025em];
+    font-size: clamp(1.875rem, 4.4vw, 3.25rem);
+  }
+
+  .display-md {
+    @apply font-display font-bold leading-[1.12] tracking-[-0.02em];
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  /* Small uppercase label sitting above a section title. */
+  .eyebrow {
+    @apply text-[0.8125rem] font-medium text-muted-foreground;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300;
+  }
+
+  .card-hover:hover {
+    @apply -translate-y-1 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.35)];
+  }
+
+  /* Horizontal card rail: snaps card by card, hides its scrollbar. */
+  .rail {
+    @apply flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-2;
+    scrollbar-width: none;
+  }
+
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rail > * {
+    @apply snap-start;
+  }
+
+  /* Text over photography stays readable without washing the image out. */
+  .photo-scrim {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.32) 42%, rgba(0, 0, 0, 0.05) 100%);
+  }
+}
+
+@keyframes slowZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+
+@keyframes ping-slow {
+  0% { transform: scale(1); opacity: 0.6; }
+  75%, 100% { transform: scale(1.8); opacity: 0; }
+}
+
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

@@ -1,0 +1,12 @@
+# Classmate
+
+> Classmate husaidia wazazi Tanzania kupata na kulinganisha shule bora za sekondari (O-Level & A-Level) na vyuo binafsi, pamoja na fursa za masomo nje ya nchi.
+
+## Pages
+
+- [Home](/): Karibu Classmate — anza kutafuta shule bora.
+- [Shule & Vyuo](/shule): Orodha ya shule za sekondari, vyuo na fursa za nje.
+- [Linganisha Shule](/linganisha): Linganisha shule mbili au zaidi upande kwa upande.
+- [Omba Nafasi](/omba-nafasi): Jaza fomu tupate kukushauri shule sahihi.
+- [Kwa Shule](/kwa-shule): Taarifa kwa wamiliki wa shule binafsi wanaotaka kushirikiana nasi.
+- [Blog](/blog): Makala za ushauri kuhusu elimu, uchaguzi wa shule na maandalizi.

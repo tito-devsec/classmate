@@ -1,0 +1,555 @@
+[
+  {
+    "id": "christon",
+    "name": "Christon Secondary School",
+    "location": "Bagamoyo, Pwani",
+    "region": "Pwani",
+    "tuitionMin": 1500000,
+    "tuitionMax": 2200000,
+    "boardingDay": "Boarding",
+    "levels": [
+      "O-Level"
+    ],
+    "gender": "Boys",
+    "description": "Christon Secondary School ni shule ya wavulana ya O-Level iliyopo Bagamoyo yenye mazingira bora ya boarding na malezi ya nidhamu. Shule inajulikana kwa matokeo mazuri na mazingira salama ya kujifunza.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba",
+      "Bweni",
+      "Uwanja wa Michezo",
+      "Cafeteria",
+      "Chapel"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara"
+    ],
+    "phone": "+255 718 900 001",
+    "email": "info@christon.ac.tz",
+    "image": "school-1",
+    "rating": 4.7,
+    "performance": {
+      "divisionI": 78,
+      "divisionII": 15,
+      "divisionIII": 5,
+      "divisionIV": 2,
+      "division0": 0
+    },
+    "feesStructure": {
+      "boarding": 2200000,
+      "otherContributions": 300000
+    }
+  },
+  {
+    "id": "rainbow",
+    "name": "Rainbow Secondary School",
+    "location": "Kingazi, Bagamoyo, Pwani",
+    "region": "Pwani",
+    "tuitionMin": 1200000,
+    "tuitionMax": 1800000,
+    "boardingDay": "Both",
+    "levels": [
+      "O-Level"
+    ],
+    "gender": "Mixed",
+    "description": "Rainbow Secondary School iko Kingazi, Bagamoyo na inatoa elimu bora kwa wanafunzi wa O-Level katika mazingira ya utulivu na nidhamu. Shule ina walimu wenye weledi na vifaa vya kisasa.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba",
+      "Bweni",
+      "Uwanja wa Mpira",
+      "Maabara ya Kompyuta"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara"
+    ],
+    "phone": "+255 718 900 002",
+    "email": "info@rainbow.ac.tz",
+    "image": "school-2",
+    "rating": 4.5,
+    "performance": {
+      "divisionI": 65,
+      "divisionII": 20,
+      "divisionIII": 10,
+      "divisionIV": 4,
+      "division0": 1
+    },
+    "feesStructure": {
+      "boarding": 1800000,
+      "day": 1200000,
+      "otherContributions": 250000
+    }
+  },
+  {
+    "id": "1",
+    "name": "Dar International Academy",
+    "location": "Masaki, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 3000000,
+    "tuitionMax": 5000000,
+    "boardingDay": "Both",
+    "levels": [
+      "O-Level",
+      "A-Level"
+    ],
+    "gender": "Mixed",
+    "description": "Shule ya kisasa yenye viwango vya juu vya elimu. Tunatoa mazingira bora ya kujifunza na walimu wenye uzoefu mkubwa. Shule ina historia ndefu ya matokeo mazuri na wanafunzi wengi wanaendelea na masomo ya juu.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba",
+      "Uwanja wa Michezo",
+      "Maabara ya Kompyuta",
+      "Bweni",
+      "Swimming Pool",
+      "Cafeteria"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara",
+      "Sanaa"
+    ],
+    "phone": "+255 712 345 678",
+    "email": "info@darinternational.ac.tz",
+    "image": "school-1",
+    "rating": 4.8,
+    "performance": {
+      "divisionI": 85,
+      "divisionII": 10,
+      "divisionIII": 3,
+      "divisionIV": 2,
+      "division0": 0
+    },
+    "feesStructure": {
+      "boarding": 5000000,
+      "day": 3000000,
+      "otherContributions": 500000
+    }
+  },
+  {
+    "id": "2",
+    "name": "Feza Boys Secondary",
+    "location": "Kijitonyama, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 2500000,
+    "tuitionMax": 4000000,
+    "boardingDay": "Boarding",
+    "levels": [
+      "O-Level",
+      "A-Level"
+    ],
+    "gender": "Boys",
+    "description": "Shule bora ya wavulana yenye msingi wa kinidhamu na kitaaluma. Matokeo mazuri ya mitihani kila mwaka. Wanafunzi wetu wanapata Division I kwa wingi na kuendelea vyuo vikuu bora.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba",
+      "Uwanja wa Mpira",
+      "Bweni",
+      "Canteen",
+      "Chapel"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara"
+    ],
+    "phone": "+255 713 456 789",
+    "email": "info@fezaboys.ac.tz",
+    "image": "school-2",
+    "rating": 4.6,
+    "performance": {
+      "divisionI": 75,
+      "divisionII": 15,
+      "divisionIII": 7,
+      "divisionIV": 3,
+      "division0": 0
+    },
+    "feesStructure": {
+      "boarding": 4000000,
+      "otherContributions": 400000
+    }
+  },
+  {
+    "id": "3",
+    "name": "Haven of Peace Academy",
+    "location": "Mbezi Beach, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 5000000,
+    "tuitionMax": 8000000,
+    "boardingDay": "Day",
+    "levels": [
+      "O-Level",
+      "A-Level"
+    ],
+    "gender": "Mixed",
+    "description": "Elimu ya kimataifa kwa viwango vya juu. Wanafunzi wetu wanaendelea vyuo vikuu bora duniani. Mazingira ya kujifunza ni ya kisasa na salama, na walimu wote ni wa kiwango cha kimataifa.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Studio ya Sanaa",
+      "Uwanja wa Michezo",
+      "Swimming Pool",
+      "Maktaba ya Kisasa",
+      "Music Room",
+      "ICT Center"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara",
+      "Sanaa",
+      "Lugha"
+    ],
+    "phone": "+255 714 567 890",
+    "email": "info@hopac.ac.tz",
+    "image": "school-3",
+    "rating": 4.9,
+    "performance": {
+      "divisionI": 92,
+      "divisionII": 6,
+      "divisionIII": 2,
+      "divisionIV": 0,
+      "division0": 0
+    },
+    "feesStructure": {
+      "day": 8000000,
+      "otherContributions": 800000
+    }
+  },
+  {
+    "id": "4",
+    "name": "Al-Muntazir Girls Secondary",
+    "location": "Upanga, Dar es Salaam",
+    "region": "Dar es Salaam",
+    "tuitionMin": 1800000,
+    "tuitionMax": 3000000,
+    "boardingDay": "Day",
+    "levels": [
+      "O-Level"
+    ],
+    "gender": "Girls",
+    "description": "Shule bora ya wasichana yenye mazingira salama na ya kielimu. Tunathamini nidhamu na mafanikio ya kitaaluma. Wanafunzi wetu wanapata matokeo bora na kuendelea na masomo ya A-Level katika shule maarufu.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba",
+      "Maabara ya Kompyuta",
+      "Uwanja wa Netball",
+      "Cafeteria"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara"
+    ],
+    "phone": "+255 715 678 901",
+    "email": "info@almuntazir.ac.tz",
+    "image": "school-4",
+    "rating": 4.5,
+    "performance": {
+      "divisionI": 68,
+      "divisionII": 20,
+      "divisionIII": 8,
+      "divisionIV": 4,
+      "division0": 0
+    },
+    "feesStructure": {
+      "day": 3000000,
+      "otherContributions": 300000
+    }
+  },
+  {
+    "id": "5",
+    "name": "Coastal Academy",
+    "location": "Bagamoyo, Pwani",
+    "region": "Pwani",
+    "tuitionMin": 1500000,
+    "tuitionMax": 2500000,
+    "boardingDay": "Boarding",
+    "levels": [
+      "O-Level",
+      "A-Level"
+    ],
+    "gender": "Mixed",
+    "description": "Shule ya boarding katika mazingira tulivu ya pwani. Tunajivunia matokeo bora na mazingira ya kijamii. Wanafunzi wanafurahia michezo na shughuli mbalimbali za ziada.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba",
+      "Bweni",
+      "Uwanja wa Michezo",
+      "Shamba la Kilimo",
+      "Dining Hall"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara",
+      "Kilimo"
+    ],
+    "phone": "+255 716 789 012",
+    "email": "info@coastalacademy.ac.tz",
+    "image": "school-5",
+    "rating": 4.3,
+    "performance": {
+      "divisionI": 55,
+      "divisionII": 25,
+      "divisionIII": 12,
+      "divisionIV": 6,
+      "division0": 2
+    },
+    "feesStructure": {
+      "boarding": 2500000,
+      "otherContributions": 250000
+    }
+  },
+  {
+    "id": "6",
+    "name": "Kibaha Secondary School",
+    "location": "Kibaha, Pwani",
+    "region": "Pwani",
+    "tuitionMin": 1200000,
+    "tuitionMax": 2000000,
+    "boardingDay": "Both",
+    "levels": [
+      "O-Level"
+    ],
+    "gender": "Mixed",
+    "description": "Shule ya bei nafuu yenye viwango vizuri vya elimu. Tunatoa fursa sawa kwa wanafunzi wote. Mazingira ya kujifunza ni mazuri na yenye utulivu.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba",
+      "Uwanja wa Michezo",
+      "Bweni",
+      "Canteen"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara"
+    ],
+    "phone": "+255 717 890 123",
+    "email": "info@kibahasec.ac.tz",
+    "image": "school-6",
+    "rating": 4.1,
+    "performance": {
+      "divisionI": 45,
+      "divisionII": 30,
+      "divisionIII": 15,
+      "divisionIV": 8,
+      "division0": 2
+    },
+    "feesStructure": {
+      "boarding": 2000000,
+      "day": 1200000,
+      "otherContributions": 200000
+    }
+  },
+  {
+    "id": "7",
+    "name": "Arusha Modern Secondary",
+    "location": "Njiro, Arusha",
+    "region": "Arusha",
+    "tuitionMin": 2000000,
+    "tuitionMax": 3500000,
+    "boardingDay": "Both",
+    "levels": [
+      "O-Level",
+      "A-Level"
+    ],
+    "gender": "Mixed",
+    "description": "Shule ya kisasa iliyopo mjini Arusha, yenye matokeo bora ya kitaaluma na mazingira salama ya kujifunza. Wanafunzi hupata mafunzo ya vitendo katika maabara za kisasa.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba",
+      "Bweni",
+      "Uwanja wa Michezo",
+      "ICT Lab",
+      "Dining Hall"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara",
+      "Sanaa"
+    ],
+    "phone": "+255 272 544 321",
+    "email": "info@arushamodern.ac.tz",
+    "image": "school-1",
+    "rating": 4.5,
+    "performance": {
+      "divisionI": 72,
+      "divisionII": 18,
+      "divisionIII": 7,
+      "divisionIV": 3,
+      "division0": 0
+    },
+    "feesStructure": {
+      "boarding": 3500000,
+      "day": 2000000,
+      "otherContributions": 350000
+    }
+  },
+  {
+    "id": "8",
+    "name": "Mwanza Gulf Academy",
+    "location": "Ilemela, Mwanza",
+    "region": "Mwanza",
+    "tuitionMin": 1800000,
+    "tuitionMax": 3000000,
+    "boardingDay": "Boarding",
+    "levels": [
+      "O-Level",
+      "A-Level"
+    ],
+    "gender": "Boys",
+    "description": "Shule bora ya wavulana iliyopo kando ya Ziwa Victoria. Tunatoa elimu bora ya sayansi na teknolojia pamoja na malezi ya nidhamu na uongozi.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba",
+      "Bweni",
+      "Uwanja wa Mpira",
+      "Computer Lab",
+      "Chapel"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara"
+    ],
+    "phone": "+255 282 500 456",
+    "email": "info@mwanzagulf.ac.tz",
+    "image": "school-2",
+    "rating": 4.4,
+    "performance": {
+      "divisionI": 65,
+      "divisionII": 22,
+      "divisionIII": 8,
+      "divisionIV": 4,
+      "division0": 1
+    },
+    "feesStructure": {
+      "boarding": 3000000,
+      "otherContributions": 300000
+    }
+  },
+  {
+    "id": "9",
+    "name": "Dodoma Central Girls",
+    "location": "Makole, Dodoma",
+    "region": "Dodoma",
+    "tuitionMin": 1500000,
+    "tuitionMax": 2500000,
+    "boardingDay": "Boarding",
+    "levels": [
+      "O-Level"
+    ],
+    "gender": "Girls",
+    "description": "Shule bora ya wasichana iliyopo mji mkuu Dodoma. Tunathamini elimu bora, nidhamu, na uwezo wa wasichana katika sayansi na teknolojia.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba",
+      "Bweni",
+      "Uwanja wa Netball",
+      "ICT Lab",
+      "Cafeteria"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara"
+    ],
+    "phone": "+255 262 321 789",
+    "email": "info@dodomacentralgirls.ac.tz",
+    "image": "school-4",
+    "rating": 4.2,
+    "performance": {
+      "divisionI": 58,
+      "divisionII": 25,
+      "divisionIII": 12,
+      "divisionIV": 4,
+      "division0": 1
+    },
+    "feesStructure": {
+      "boarding": 2500000,
+      "otherContributions": 250000
+    }
+  },
+  {
+    "id": "10",
+    "name": "Tanga Technical Academy",
+    "location": "Chumbageni, Tanga",
+    "region": "Tanga",
+    "tuitionMin": 1200000,
+    "tuitionMax": 2200000,
+    "boardingDay": "Both",
+    "levels": [
+      "O-Level",
+      "A-Level"
+    ],
+    "gender": "Mixed",
+    "description": "Shule ya kisasa yenye mchanganyiko wa elimu ya kawaida na ufundi. Wanafunzi hupata mafunzo ya vitendo pamoja na masomo ya darasani.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Workshop",
+      "Maktaba",
+      "Bweni",
+      "Uwanja wa Michezo",
+      "Canteen"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara",
+      "Ufundi"
+    ],
+    "phone": "+255 272 264 5678",
+    "email": "info@tangatech.ac.tz",
+    "image": "school-3",
+    "rating": 4,
+    "performance": {
+      "divisionI": 48,
+      "divisionII": 28,
+      "divisionIII": 15,
+      "divisionIV": 7,
+      "division0": 2
+    },
+    "feesStructure": {
+      "boarding": 2200000,
+      "day": 1200000,
+      "otherContributions": 200000
+    }
+  },
+  {
+    "id": "11",
+    "name": "Kilimanjaro Highlands School",
+    "location": "Moshi, Kilimanjaro",
+    "region": "Kilimanjaro",
+    "tuitionMin": 2500000,
+    "tuitionMax": 4000000,
+    "boardingDay": "Boarding",
+    "levels": [
+      "O-Level",
+      "A-Level"
+    ],
+    "gender": "Mixed",
+    "description": "Shule ya boarding iliyopo chini ya Mlima Kilimanjaro, yenye mazingira mazuri ya kujifunza na matokeo bora ya kitaaluma tangu kuanzishwa kwake.",
+    "facilities": [
+      "Maabara ya Sayansi",
+      "Maktaba ya Kisasa",
+      "Bweni",
+      "Swimming Pool",
+      "Sports Complex",
+      "Music Room"
+    ],
+    "programs": [
+      "Sayansi",
+      "Biashara",
+      "Sanaa",
+      "Lugha"
+    ],
+    "phone": "+255 272 275 1234",
+    "email": "info@kilihighlands.ac.tz",
+    "image": "school-5",
+    "rating": 4.7,
+    "performance": {
+      "divisionI": 80,
+      "divisionII": 13,
+      "divisionIII": 5,
+      "divisionIV": 2,
+      "division0": 0
+    },
+    "feesStructure": {
+      "boarding": 4000000,
+      "otherContributions": 400000
+    }
+  }
+]
