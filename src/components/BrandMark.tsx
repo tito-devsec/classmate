@@ -1,49 +1,65 @@
 import { Link } from "react-router-dom";
 
 interface BrandMarkProps {
-  /** Renders the wordmark on a dark surface. */
+  /** `full` = badge + wordmark (header, footer); `mark` = badge only (overlay header). */
+  variant?: "full" | "mark";
+  /** Renders on photography / dark surfaces. */
   inverted?: boolean;
   className?: string;
 }
 
-/**
- * Classmate wordmark: a crimson tile holding a stylised open book, the name, and the
- * years-of-service chip that sits under it in the header.
- */
-export function BrandMark({ inverted = false, className = "" }: BrandMarkProps) {
+/** Crimson badge with an open book and a gold "TZ" ribbon. */
+export function BrandBadge({ className = "h-11 w-11" }: { className?: string }) {
   return (
-    <Link to="/" className={`group flex items-center gap-2.5 ${className}`} aria-label="Classmate — nyumbani">
-      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-primary shadow-[0_6px_14px_-6px_hsl(var(--primary))]">
-        <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true" fill="none">
-          <path
-            d="M3 5.4c2.7-.9 5.2-.9 7.6.2.3.1.5.4.5.7v12c0 .6-.6 1-1.1.7-2.2-1-4.5-1-7-.2V5.4Z"
-            fill="white"
-            fillOpacity="0.95"
-          />
-          <path
-            d="M21 5.4c-2.7-.9-5.2-.9-7.6.2-.3.1-.5.4-.5.7v12c0 .6.6 1 1.1.7 2.2-1 4.5-1 7-.2V5.4Z"
-            fill="white"
-            fillOpacity="0.72"
-          />
-        </svg>
-      </span>
+    <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
+      <rect x="4" y="2" width="40" height="40" rx="9" fill="hsl(352 62% 43%)" />
+      <path
+        d="M14 13.5c3.4-1.3 6.7-1.3 10 .3v14.4c-3.3-1.6-6.6-1.6-10-.3Z"
+        fill="#fff"
+      />
+      <path
+        d="M34 13.5c-3.4-1.3-6.7-1.3-10 .3v14.4c3.3-1.6 6.6-1.6 10-.3Z"
+        fill="#fff"
+        fillOpacity="0.8"
+      />
+      <path d="M8 36h32l-3 6H11z" fill="hsl(38 76% 50%)" />
+      <path d="M8 36 5 40l4 2z M40 36l3 4-4 2z" fill="hsl(38 76% 40%)" />
+      <text
+        x="24"
+        y="40.6"
+        textAnchor="middle"
+        fontSize="6"
+        fontWeight="700"
+        fill="#fff"
+        fontFamily="Segoe UI, Open Sans, sans-serif"
+      >
+        TANZANIA
+      </text>
+    </svg>
+  );
+}
 
-      <span className="flex flex-col leading-none">
-        <span
-          className={`font-display text-[1.0625rem] font-extrabold tracking-[-0.02em] ${
-            inverted ? "text-background" : "text-foreground"
-          }`}
-        >
-          Classmate
-        </span>
-        <span className="mt-1 flex items-center gap-1">
-          <span className="rounded-[3px] bg-primary/12 px-1 py-px text-[9px] font-bold uppercase tracking-[0.1em] text-primary">
-            Tanzania
-          </span>
-          <span className={`text-[9px] font-medium ${inverted ? "text-background/60" : "text-muted-foreground"}`}>
-            Shule &amp; Vyuo
-          </span>
-        </span>
+export function BrandMark({ variant = "full", inverted = false, className = "" }: BrandMarkProps) {
+  if (variant === "mark") {
+    return (
+      <Link
+        to="/"
+        aria-label="Classmate — nyumbani"
+        className={`flex h-10 w-10 items-center justify-center rounded-lg bg-white/95 shadow-sm ${className}`}
+      >
+        <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+          <path d="M3 5.5c2.5-1 5-1 7.5.2v11c-2.5-1.2-5-1.2-7.5-.2Z" fill="hsl(352 62% 43%)" />
+          <path d="M21 5.5c-2.5-1-5-1-7.5.2v11c2.5-1.2 5-1.2 7.5-.2Z" fill="hsl(352 62% 43%)" fillOpacity="0.7" />
+        </svg>
+      </Link>
+    );
+  }
+
+  return (
+    <Link to="/" className={`flex items-center gap-2 ${className}`} aria-label="Classmate — nyumbani">
+      <BrandBadge className="h-11 w-11 shrink-0" />
+      <span className={`text-[21px] font-bold leading-none tracking-[-0.01em] ${inverted ? "text-white" : "text-foreground"}`}>
+        Classmate
       </span>
     </Link>
   );

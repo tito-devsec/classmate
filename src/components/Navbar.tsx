@@ -1,230 +1,313 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, Menu, Search, X } from "lucide-react";
+import { Check, ChevronDown, Menu, Search, X } from "lucide-react";
 import { BrandMark } from "@/components/BrandMark";
+import { AuthDialog } from "@/components/AuthDialog";
+import { FlagTZ, FlagUS, NewBadge } from "@/components/icons";
+import { endSession, useSession } from "@/lib/session";
+import { useI18n, LANGUAGES, type Lang } from "@/i18n";
+import type { TranslationKey } from "@/i18n/translations";
 
-const navLinks = [
-  { label: "Ranking", path: "/shule?sort=results", badge: "MPYA" },
-  { label: "Tafuta shule", path: "/shule" },
-  { label: "Linganisha", path: "/linganisha" },
-  { label: "Vyuo", path: "/shule?tab=vyuo" },
-  { label: "Blog", path: "/blog" },
+interface NavbarProps {
+  /**
+   * `solid` — white sticky bar (every page).
+   * `overlay` — transparent, sits over the profile hero; links collapse into the menu.
+   */
+  variant?: "solid" | "overlay";
+}
+
+const navLinks: { key: TranslationKey; path: string; isNew?: boolean }[] = [
+  { key: "nav.ranking", path: "/shule?sort=results", isNew: true },
+  { key: "nav.find", path: "/shule" },
+  { key: "nav.compare", path: "/linganisha" },
+  { key: "nav.blog", path: "/blog" },
 ];
 
-const accountLinks = [
-  { label: "Dashibodi yangu", path: "/dashboard/me" },
-  { label: "Dashibodi ya shule", path: "/dashboard/school" },
-  { label: "Kwa shule", path: "/kwa-shule" },
+const menuLinks: { key: TranslationKey; path: string; isNew?: boolean }[] = [
+  ...navLinks,
+  { key: "nav.colleges", path: "/shule?tab=colleges" },
+  { key: "nav.abroad", path: "/shule?tab=study-abroad" },
+  { key: "nav.apply", path: "/omba-nafasi" },
+  { key: "nav.forSchools", path: "/kwa-shule" },
+  { key: "nav.myDashboard", path: "/dashboard/me" },
+  { key: "nav.schoolDashboard", path: "/dashboard/school" },
 ];
 
-const languages = [
-  { code: "sw", label: "Kiswahili", flag: "🇹🇿" },
-  { code: "en", label: "English", flag: "🇬🇧" },
-];
+/** Each language shows the flag of the country it is spoken in. */
+const FLAGS: Record<Lang, (props: { className?: string }) => JSX.Element> = {
+  sw: FlagTZ,
+  en: FlagUS,
+};
 
-const LANGUAGE_KEY = "classmate.language";
-
-export function Navbar() {
-  const [open, setOpen] = useState(false);
+export function Navbar({ variant = "solid" }: NavbarProps) {
+  const overlay = variant === "overlay";
+  const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [language, setLanguage] = useState(languages[0]);
+  const [userOpen, setUserOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const [query, setQuery] = useState("");
   const langRef = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const session = useSession();
+  const { lang, setLang, t } = useI18n();
+
+  const ActiveFlag = FLAGS[lang];
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(LANGUAGE_KEY);
-      const match = languages.find((entry) => entry.code === saved);
-      if (match) setLanguage(match);
-    } catch {
-      /* private mode — keep the default */
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!langOpen) return undefined;
     const close = (event: MouseEvent) => {
       if (!langRef.current?.contains(event.target as Node)) setLangOpen(false);
+      if (!userRef.current?.contains(event.target as Node)) setUserOpen(false);
     };
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
-  }, [langOpen]);
+  }, []);
 
   useEffect(() => {
-    setOpen(false);
-  }, [location.pathname]);
+    setMenuOpen(false);
+  }, [location.pathname, location.search]);
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     navigate(query.trim() ? `/shule?q=${encodeURIComponent(query.trim())}` : "/shule");
   };
 
-  const pickLanguage = (entry: (typeof languages)[number]) => {
-    setLanguage(entry);
-    setLangOpen(false);
-    try {
-      localStorage.setItem(LANGUAGE_KEY, entry.code);
-    } catch {
-      /* ignore */
-    }
-  };
+  const ink = overlay ? "text-white" : "text-foreground";
 
-  return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/85">
-      <div className="mx-auto flex h-[72px] max-w-[1320px] items-center gap-4 px-4 sm:px-6">
-        <BrandMark />
+  const languageMenu = (
+    <div ref={langRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setLangOpen((value) => !value)}
+        aria-haspopup="listbox"
+        aria-expanded={langOpen}
+        aria-label={t("nav.chooseLanguage")}
+        className={`flex h-9 items-center gap-1.5 rounded-md border px-2 transition ${
+          overlay ? "border-white/80 text-white hover:bg-white/10" : "border-[#c9c9c9] hover:border-foreground/40"
+        }`}
+      >
+        <ActiveFlag className="h-[17px] w-[26px]" />
+        <ChevronDown className="h-3.5 w-3.5" />
+      </button>
 
-        {/* Header search — the quickest route into the catalogue from any page. */}
-        <form onSubmit={submit} className="relative hidden min-w-0 flex-1 md:block lg:max-w-[280px]">
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Tafuta shule au mkoa…"
-            aria-label="Tafuta shule"
-            className="h-11 w-full rounded-full bg-muted px-4 pr-11 text-sm text-foreground outline-none ring-primary/25 transition placeholder:text-muted-foreground focus:bg-card focus:ring-2"
-          />
-          <button
-            type="submit"
-            aria-label="Tafuta"
-            className="absolute right-1.5 top-1.5 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-card hover:text-primary"
-          >
-            <Search className="h-4 w-4" />
-          </button>
-        </form>
+      {langOpen && (
+        <div className="absolute right-0 top-11 z-50 w-[252px] overflow-hidden rounded-xl border border-border bg-card shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
+          <p className="border-b border-border px-4 py-3 text-[15px] font-semibold text-foreground">
+            {t("nav.chooseLanguage")}
+          </p>
+          <ul role="listbox" className="py-1">
+            {LANGUAGES.map((entry) => {
+              const Flag = FLAGS[entry.code];
+              const active = entry.code === lang;
+              return (
+                <li key={entry.code}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={active}
+                    onClick={() => {
+                      setLang(entry.code);
+                      setLangOpen(false);
+                    }}
+                    className={`flex w-full items-center gap-3 px-4 py-3 text-[15px] transition hover:bg-muted ${
+                      active ? "font-semibold text-primary" : "text-foreground"
+                    }`}
+                  >
+                    <Flag className="h-[20px] w-[30px]" />
+                    <span className="flex-1 text-left">{entry.label}</span>
+                    {active && <Check className="h-4 w-4" strokeWidth={2.5} />}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
 
-        <nav className="ml-auto hidden items-center gap-6 lg:flex">
-          {navLinks.map((link) => {
-            const active = location.pathname + location.search === link.path;
-            return (
-              <Link
-                key={link.label}
-                to={link.path}
-                className={`relative text-[0.9375rem] font-medium transition-colors hover:text-primary ${
-                  active ? "text-primary" : "text-foreground/80"
-                }`}
-              >
-                {link.label}
-                {link.badge && (
-                  <span className="absolute -right-8 -top-2.5 rounded-full bg-primary px-1.5 py-px text-[9px] font-bold text-primary-foreground">
-                    {link.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="ml-auto flex items-center gap-2 lg:ml-4">
-          {/* Language */}
-          <div ref={langRef} className="relative hidden sm:block">
-            <button
-              type="button"
-              onClick={() => setLangOpen((value) => !value)}
-              aria-haspopup="listbox"
-              aria-expanded={langOpen}
-              className="flex h-10 items-center gap-1.5 rounded-full border border-border px-3 text-sm transition hover:border-foreground/25"
-            >
-              <span className="text-base leading-none">{language.flag}</span>
-              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-            </button>
-
-            {langOpen && (
-              <ul
-                role="listbox"
-                className="absolute right-0 top-12 w-44 overflow-hidden rounded-xl border border-border bg-card py-1 shadow-xl"
-              >
-                {languages.map((entry) => (
-                  <li key={entry.code}>
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={entry.code === language.code}
-                      onClick={() => pickLanguage(entry)}
-                      className={`flex w-full items-center gap-2.5 px-3 py-2.5 text-sm transition hover:bg-muted ${
-                        entry.code === language.code ? "font-semibold text-primary" : "text-foreground"
-                      }`}
-                    >
-                      <span className="text-base leading-none">{entry.flag}</span>
-                      {entry.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <span className="hidden h-5 w-px bg-border lg:block" />
-
-          <Link
-            to="/omba-nafasi"
-            className="hidden h-10 items-center rounded-full px-3 text-[0.9375rem] font-semibold text-foreground transition hover:text-primary lg:flex"
-          >
-            Ingia
+  const account = session ? (
+    <div ref={userRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setUserOpen((value) => !value)}
+        className={`flex items-center gap-1 text-[16px] font-semibold ${ink}`}
+        aria-haspopup="menu"
+        aria-expanded={userOpen}
+      >
+        {session.fname}
+        <ChevronDown className="h-3.5 w-3.5" />
+      </button>
+      {userOpen && (
+        <div role="menu" className="absolute right-0 top-9 z-50 w-48 overflow-hidden rounded-lg border border-border bg-card py-1 shadow-xl">
+          <Link to="/dashboard/me" role="menuitem" className="block px-4 py-2.5 text-[15px] text-foreground hover:bg-muted">
+            {t("nav.myDashboard")}
           </Link>
-
-          <Link
-            to="/omba-nafasi"
-            className="hidden h-10 items-center rounded-full bg-primary px-5 text-[0.9375rem] font-semibold text-primary-foreground transition hover:bg-primary/90 sm:flex"
-          >
-            Omba nafasi
-          </Link>
-
           <button
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border lg:hidden"
-            onClick={() => setOpen((value) => !value)}
-            aria-label={open ? "Funga menyu" : "Fungua menyu"}
-            aria-expanded={open}
-            aria-controls="mobile-menu"
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              endSession();
+              setUserOpen(false);
+            }}
+            className="block w-full px-4 py-2.5 text-left text-[15px] text-foreground hover:bg-muted"
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {t("nav.logout")}
           </button>
         </div>
-      </div>
+      )}
+    </div>
+  ) : (
+    <button type="button" onClick={() => setAuthOpen(true)} className={`text-[16px] font-semibold ${ink} hover:text-primary`}>
+      {t("nav.login")}
+    </button>
+  );
 
-      {open && (
-        <div id="mobile-menu" className="border-t border-border bg-card px-4 pb-5 pt-2 lg:hidden">
-          <form onSubmit={submit} className="relative mb-3 md:hidden">
+  return (
+    <>
+      <header
+        className={
+          overlay
+            ? "absolute inset-x-0 top-0 z-40"
+            : "sticky top-0 z-40 bg-card shadow-[0_1px_0_0_hsl(0_0%_90%),0_2px_10px_rgba(0,0,0,0.04)]"
+        }
+      >
+        <div className="wrap flex h-[72px] items-center gap-4">
+          {overlay ? <BrandMark variant="mark" /> : <BrandMark />}
+
+          {/* Header search — the quickest route into the catalogue from any page. */}
+          <form onSubmit={submit} className={`relative hidden md:block ${overlay ? "ml-4" : "ml-6"}`}>
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Tafuta shule au mkoa…"
-              aria-label="Tafuta shule"
-              className="h-11 w-full rounded-full bg-muted px-4 pr-11 text-sm outline-none"
+              placeholder={t("nav.searchPlaceholder")}
+              aria-label={t("nav.searchLabel")}
+              className={`h-[46px] w-[262px] rounded-full pl-4 pr-12 text-[15px] outline-none transition ${
+                overlay
+                  ? "border border-white/85 bg-transparent text-white placeholder:text-white/90 focus:bg-white/10"
+                  : "bg-[#f1f1f1] text-foreground placeholder:text-muted-foreground focus:bg-[#ebebeb]"
+              }`}
             />
             <button
               type="submit"
-              aria-label="Tafuta"
-              className="absolute right-1.5 top-1.5 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground"
+              aria-label={t("nav.search")}
+              className={`absolute top-1/2 flex -translate-y-1/2 items-center justify-center rounded-full ${
+                overlay
+                  ? "right-3 h-8 w-8 text-white"
+                  : "right-1.5 h-[34px] w-[34px] bg-[#cfcfcf] text-white transition hover:bg-[#bdbdbd]"
+              }`}
             >
-              <Search className="h-4 w-4" />
+              <Search className="h-4 w-4" strokeWidth={2.5} />
             </button>
           </form>
 
-          {[...navLinks, ...accountLinks].map((link) => (
-            <Link
-              key={link.label}
-              to={link.path}
-              className="flex items-center justify-between border-b border-border/60 py-3 text-[0.9375rem] font-medium text-foreground last:border-0"
-            >
-              {link.label}
-              {"badge" in link && link.badge && (
-                <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
-                  {link.badge}
-                </span>
-              )}
-            </Link>
-          ))}
+          {!overlay && (
+            <nav className="ml-auto hidden items-center gap-8 lg:flex">
+              {navLinks.map((link) => {
+                const active = location.pathname + location.search === link.path;
+                return (
+                  <Link
+                    key={link.key}
+                    to={link.path}
+                    className={`relative text-[16px] font-semibold transition-colors hover:text-primary ${
+                      active ? "text-primary" : "text-foreground"
+                    }`}
+                  >
+                    {link.isNew && <NewBadge label={t("nav.new")} className="absolute -left-6 -top-5" />}
+                    {t(link.key)}
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
 
-          <Link
-            to="/omba-nafasi"
-            className="mt-4 flex h-11 items-center justify-center rounded-full bg-primary text-[0.9375rem] font-semibold text-primary-foreground"
-          >
-            Omba nafasi
-          </Link>
+          <div className={`flex items-center gap-3 ${overlay ? "ml-auto" : "ml-auto lg:ml-7"}`}>
+            {languageMenu}
+
+            {!overlay && (
+              <>
+                <span className="hidden text-muted-foreground lg:inline" aria-hidden="true">
+                  ·
+                </span>
+                <span className="hidden lg:block">{account}</span>
+              </>
+            )}
+
+            <button
+              type="button"
+              className={`flex h-10 w-10 items-center justify-center rounded-md ${overlay ? "text-white" : "lg:hidden"}`}
+              onClick={() => setMenuOpen((value) => !value)}
+              aria-label={menuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
+              aria-expanded={menuOpen}
+              aria-controls="site-menu"
+            >
+              {menuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" strokeWidth={2.25} />}
+            </button>
+          </div>
         </div>
-      )}
-    </header>
+
+        {menuOpen && (
+          <div id="site-menu" className="border-t border-border bg-card shadow-xl">
+            <div className="wrap py-3">
+              <form onSubmit={submit} className="relative mb-2 md:hidden">
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={t("nav.searchPlaceholder")}
+                  aria-label={t("nav.searchLabel")}
+                  className="h-[46px] w-full rounded-full bg-[#f1f1f1] pl-4 pr-12 text-[15px] outline-none"
+                />
+                <button
+                  type="submit"
+                  aria-label={t("nav.search")}
+                  className="absolute right-1.5 top-1/2 flex h-[34px] w-[34px] -translate-y-1/2 items-center justify-center rounded-full bg-[#cfcfcf] text-white"
+                >
+                  <Search className="h-4 w-4" strokeWidth={2.5} />
+                </button>
+              </form>
+
+              <div className="grid sm:grid-cols-2">
+                {menuLinks.map((link) => (
+                  <Link
+                    key={link.key}
+                    to={link.path}
+                    className="flex items-center gap-2 border-b border-border/70 py-3 text-[16px] font-semibold text-foreground hover:text-primary"
+                  >
+                    {t(link.key)}
+                    {link.isNew && (
+                      <span className="rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-white">{t("nav.new")}</span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-4 py-3">
+                {session ? (
+                  <>
+                    <span className="text-[15px] font-semibold text-foreground">
+                      {session.fname} {session.lname}
+                    </span>
+                    <button type="button" onClick={endSession} className="text-[15px] font-semibold text-primary">
+                      {t("nav.logout")}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setAuthOpen(true)}
+                    className="rounded-full bg-primary px-6 py-2.5 text-[15px] font-semibold text-primary-foreground"
+                  >
+                    {t("nav.loginRegister")}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
+
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
+    </>
   );
 }

@@ -53,6 +53,17 @@ export interface RegisterUserInput {
   email: string;
   phone: string;
   password: string;
+  /**
+   * Optional profile answers collected on the sign-up page. They travel with the request so
+   * the advisory team can shortlist schools immediately; a backend that only reads the
+   * credentials still creates the account.
+   */
+  region?: string;
+  role?: string;
+  studentGender?: string;
+  applicationLevel?: string;
+  beginYear?: number;
+  contactable?: boolean;
 }
 
 /** POST /users/register */

@@ -4,6 +4,7 @@ import { MessageCircle, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { schools, colleges, formatTZS } from "@/data/schools";
 import { streamAdvisor, type ChatMessage } from "@/services/advisor";
+import { useT } from "@/i18n";
 
 type Msg = ChatMessage;
 
@@ -36,6 +37,7 @@ function getSchoolContext(pathname: string): { mode: string; schoolContext?: str
 
 export const AIChatBubble = () => {
   const location = useLocation();
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -86,8 +88,8 @@ export const AIChatBubble = () => {
       };
 
       const greetMsg = ctx
-        ? "Habari, naangalia shule hii. Inafaa?"
-        : "Habari, natafuta shule kwa mtoto wangu.";
+        ? t("chat.greetSchool")
+        : t("chat.greetGeneral");
 
       streamAdvisor({
         messages: [{ role: "user", content: greetMsg }],
@@ -136,7 +138,7 @@ export const AIChatBubble = () => {
   };
 
   // Dynamic bubble text based on context
-  const bubbleText = ctx ? "Je, shule hii inakufaa?" : "Mtoto anaenda wapi?";
+  const bubbleText = ctx ? t("chat.bubbleSchool") : t("chat.bubbleGeneral");
 
   return (
     <>
@@ -144,8 +146,8 @@ export const AIChatBubble = () => {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 backdrop-blur-md px-4 py-3 text-primary shadow-lg transition-all duration-300 hover:scale-105 hover:bg-primary/20 hover:shadow-xl sm:px-5"
-          aria-label="Ongea na Mshauri"
+          className="fixed bottom-4 right-[84px] z-50 flex items-center gap-2 rounded-full border border-primary/30 bg-card/95 px-4 py-3 text-primary shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-primary/10 hover:shadow-xl sm:px-5"
+          aria-label={t("chat.open")}
         >
           <span className="relative flex h-7 w-7 items-center justify-center">
             <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping-slow" />
@@ -165,8 +167,8 @@ export const AIChatBubble = () => {
                 <MessageCircle className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-bold text-foreground">Mshauri wa Shule</p>
-                <p className="text-[10px] text-muted-foreground">Classmate AI</p>
+                <p className="text-sm font-bold text-foreground">{t("chat.title")}</p>
+                <p className="text-[10px] text-muted-foreground">{t("chat.subtitle")}</p>
               </div>
             </div>
             <button onClick={() => setOpen(false)} className="rounded-full p-1 text-muted-foreground hover:bg-muted">
@@ -179,8 +181,8 @@ export const AIChatBubble = () => {
             {messages.length === 0 && !loading && (
               <div className="flex h-full flex-col items-center justify-center text-center">
                 <MessageCircle className="h-10 w-10 text-primary/30" />
-                <p className="mt-2 text-sm font-medium text-foreground">Karibu!</p>
-                <p className="text-xs text-muted-foreground">Subiri kidogo, mshauri anakuja...</p>
+                <p className="mt-2 text-sm font-medium text-foreground">{t("chat.welcome")}</p>
+                <p className="text-xs text-muted-foreground">{t("chat.waiting")}</p>
               </div>
             )}
             {messages.map((m, i) => (
@@ -213,16 +215,16 @@ export const AIChatBubble = () => {
           {ctx && messages.length > 0 && !loading && (
             <div className="flex gap-2 px-3 pb-2 overflow-x-auto">
               <button
-                onClick={() => { setInput("Nisaidie kupata shule"); }}
+                onClick={() => { setInput(t("chat.quickFindValue")); }}
                 className="whitespace-nowrap rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
               >
-                🔍 Nisaidie kupata shule
+                {t("chat.quickFind")}
               </button>
               <button
-                onClick={() => { setInput("Ada za shule hii zinafaaje?"); }}
+                onClick={() => { setInput(t("chat.quickFeesValue")); }}
                 className="whitespace-nowrap rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
               >
-                💰 Kuhusu ada
+                {t("chat.quickFees")}
               </button>
             </div>
           )}
@@ -235,7 +237,7 @@ export const AIChatBubble = () => {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Andika ujumbe..."
+              placeholder={t("chat.placeholder")}
               className="flex-1 rounded-full bg-muted px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30"
               disabled={loading}
             />

@@ -1,7 +1,10 @@
-import { Check, MapPin, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { School } from "@/data/schools";
 import { feeRange, gradeFor, isRecommended } from "@/lib/grading";
+import { FlagTZ, GenderIcon, MoneyBag, PinIcon, Starburst } from "@/components/icons";
+import { useT } from "@/i18n";
+import type { TranslationKey } from "@/i18n/translations";
 
 interface SchoolCardProps {
   school: School;
@@ -11,128 +14,90 @@ interface SchoolCardProps {
   variant?: "grid" | "rail";
 }
 
-const boardingLabel: Record<School["boardingDay"], string> = {
-  Boarding: "Bweni",
-  Day: "Kutwa",
-  Both: "Bweni / Kutwa",
+const kindKey: Record<School["boardingDay"], TranslationKey> = {
+  Boarding: "card.boarding",
+  Day: "card.day",
+  Both: "card.both",
 };
 
-const genderLabel: Record<School["gender"], string> = {
-  Boys: "Wavulana",
-  Girls: "Wasichana",
-  Mixed: "Mchanganyiko",
-};
-
+/**
+ * Catalogue tile: photo with the "recommended" corner tab, the school line and name, a
+ * two-column fee / location strip, then the grade disc and the arrow into the profile.
+ */
 export function SchoolCard({ school, onCompare, isComparing, variant = "grid" }: SchoolCardProps) {
+  const t = useT();
   const grade = gradeFor(school);
-  const recommended = isRecommended(school);
 
   return (
-    <article
-      className={`card-hover group relative overflow-hidden rounded-[20px] bg-card shadow-[0_2px_14px_-8px_rgba(0,0,0,0.25)] ${
-        variant === "rail" ? "w-[288px] shrink-0 sm:w-[320px]" : "w-full"
-      }`}
-    >
-      <Link to={`/shule/${school.id}`} className="block">
-        <div className="relative aspect-[16/11] overflow-hidden">
+    <article className={`tile card-hover group relative ${variant === "rail" ? "w-[320px] shrink-0 sm:w-[415px]" : "w-full"}`}>
+      <Link to={`/shule/${school.id}`} className="block" aria-label={school.name}>
+        <div className="relative h-[300px] overflow-hidden">
           <img
             src={school.image}
             alt={school.name}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
-
-          {recommended && (
-            <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-[11px] font-semibold text-foreground shadow-sm">
-              <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500">
-                <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
-              </span>
-              Inapendekezwa
+          {isRecommended(school) && (
+            <span className="absolute left-0 top-0 flex items-center gap-2 rounded-br-2xl bg-card py-4 pl-6 pr-6 text-[16px] font-semibold text-foreground">
+              <Starburst className="h-[18px] w-[18px] text-teal" />
+              {t("card.recommended")}
             </span>
           )}
-
-          <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-primary text-[13px] font-bold text-primary-foreground shadow-md">
-            {grade}
-          </span>
-
-          <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between gap-2 p-3">
-            <span className="flex flex-wrap gap-1">
-              {school.levels.map((level) => (
-                <span
-                  key={level}
-                  className="rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm"
-                >
-                  {level}
-                </span>
-              ))}
-            </span>
-          </div>
         </div>
       </Link>
 
-      <div className="p-4">
-        <Link to={`/shule/${school.id}`}>
-          <h3 className="font-display text-[1.0625rem] font-bold leading-snug text-foreground transition-colors group-hover:text-primary">
-            {school.name}
-          </h3>
-        </Link>
+      <div className="px-6 pt-7">
+        <p className="flex items-center gap-2 text-[15px] text-foreground">
+          <GenderIcon gender={school.gender} className="h-[17px] w-[17px]" />
+          {t(kindKey[school.boardingDay])}
+        </p>
 
-        <div className="mt-1.5 flex items-center gap-2 text-[13px] text-muted-foreground">
-          {school.rating > 0 && (
-            <span className="flex items-center gap-1 font-semibold text-foreground">
-              <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-              {school.rating.toFixed(1)}
-            </span>
-          )}
-          <span className="flex min-w-0 items-center gap-1">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{school.location}</span>
-          </span>
+        <div className="mt-3 flex items-center justify-between gap-3 pb-6">
+          <Link to={`/shule/${school.id}`} className="min-w-0">
+            <h3 className="truncate text-[22px] font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">
+              {school.name}
+            </h3>
+          </Link>
+          <FlagTZ className="h-[30px] w-[44px] shrink-0" />
         </div>
+      </div>
 
-        <dl className="mt-3 flex flex-wrap gap-1.5 text-[11px]">
-          <span className="rounded-full bg-muted px-2.5 py-1 font-medium text-foreground/75">
-            {boardingLabel[school.boardingDay]}
-          </span>
-          <span className="rounded-full bg-muted px-2.5 py-1 font-medium text-foreground/75">
-            {genderLabel[school.gender]}
-          </span>
-          {school.performance.divisionI > 0 && (
-            <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-semibold text-emerald-700">
-              Div I · {school.performance.divisionI}%
-            </span>
-          )}
-        </dl>
-
-        <div className="mt-4 flex items-end justify-between gap-3 border-t border-border/70 pt-3">
-          <div className="min-w-0">
-            <p className="text-[11px] text-muted-foreground">Ada kwa mwaka</p>
-            <p className="truncate font-display text-[0.9375rem] font-bold text-foreground">
-              {feeRange(school.tuitionMin, school.tuitionMax)}
-            </p>
-          </div>
-
-          {onCompare ? (
-            <button
-              type="button"
-              onClick={() => onCompare(school)}
-              className={`shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition ${
-                isComparing
-                  ? "bg-foreground text-background"
-                  : "border border-foreground/15 text-foreground hover:border-primary hover:text-primary"
-              }`}
-            >
-              {isComparing ? "Imechaguliwa" : "Linganisha"}
-            </button>
-          ) : (
-            <Link
-              to={`/shule/${school.id}`}
-              className="shrink-0 rounded-full border border-foreground/15 px-4 py-2 text-[13px] font-semibold text-foreground transition hover:border-primary hover:text-primary"
-            >
-              Angalia
-            </Link>
-          )}
+      <div className="grid grid-cols-2 border-t border-[#ededed]">
+        <div className="flex flex-col items-center gap-1.5 py-4 text-foreground">
+          <MoneyBag className="h-[22px] w-[22px]" />
+          <span className="text-[15px]">{feeRange(school.tuitionMin, school.tuitionMax)}</span>
         </div>
+        <div className="flex flex-col items-center gap-1.5 border-l border-[#ededed] py-4 text-foreground">
+          <PinIcon className="h-[22px] w-[22px]" />
+          <span className="text-[15px]">{school.region}, TZ</span>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between border-t border-[#ededed] px-6 py-4">
+        <span className="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-primary text-[14px] font-bold text-primary-foreground">
+          {grade}
+        </span>
+
+        {onCompare ? (
+          <button
+            type="button"
+            onClick={() => onCompare(school)}
+            className={`rounded-full px-4 py-1.5 text-[14px] font-semibold transition ${
+              isComparing ? "bg-foreground text-background" : "border border-[#cfcfcf] text-foreground hover:border-primary hover:text-primary"
+            }`}
+          >
+            {isComparing ? t("card.comparing") : t("card.compare")}
+          </button>
+        ) : (
+          <Link
+            to={`/shule/${school.id}`}
+            aria-label={t("card.open", { name: school.name })}
+            className="text-foreground transition hover:text-primary"
+          >
+            <ArrowRight className="h-6 w-6" strokeWidth={2} />
+          </Link>
+        )}
       </div>
     </article>
   );

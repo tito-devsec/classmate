@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getCompareIds, setCompareIds } from "@/lib/compare";
 import { ArrowLeft, X, Star, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
@@ -17,17 +18,34 @@ const CompareSchools = () => {
   const { data: page } = useSchools({ limit: 60 });
   const schools = page?.items?.length ? page.items : seedSchools;
 
+  // Shortlist chosen elsewhere (profile page "+ Linganisha") pre-fills the comparison.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    if (hydrated || schools.length === 0) return;
+    const ids = getCompareIds();
+    const preselected = ids.map((id) => schools.find((s) => s.id === id)).filter((s): s is School => Boolean(s));
+    if (preselected.length > 0) {
+      setSelected(preselected);
+      setShowPicker(preselected.length < 2);
+    }
+    setHydrated(true);
+  }, [schools, hydrated]);
+
   const toggleSchool = (school: School) => {
     setSelected((prev) => {
       const exists = prev.find((s) => s.id === school.id);
-      if (exists) return prev.filter((s) => s.id !== school.id);
-      if (prev.length >= 3) return prev;
-      return [...prev, school];
+      const next = exists ? prev.filter((s) => s.id !== school.id) : prev.length >= 3 ? prev : [...prev, school];
+      setCompareIds(next.map((s) => s.id));
+      return next;
     });
   };
 
   const removeSchool = (id: string) => {
-    setSelected((prev) => prev.filter((s) => s.id !== id));
+    setSelected((prev) => {
+      const next = prev.filter((s) => s.id !== id);
+      setCompareIds(next.map((s) => s.id));
+      return next;
+    });
   };
 
   return (

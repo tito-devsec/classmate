@@ -14,10 +14,14 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Plus Jakarta Sans", "sans-serif"],
-        body: ["Inter", "sans-serif"],
+        display: ["Segoe UI", "system-ui", "-apple-system", "Open Sans", "Roboto", "sans-serif"],
+        body: ["Segoe UI", "system-ui", "-apple-system", "Open Sans", "Roboto", "sans-serif"],
       },
       colors: {
+        teal: "hsl(var(--teal))",
+        gold: "hsl(var(--gold))",
+        cream: "hsl(var(--cream))",
+        footer: "hsl(var(--footer))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

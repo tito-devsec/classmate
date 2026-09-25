@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, GraduationCap, MapPin, MessageCircle, Quote, Shield, Star, Users } from "lucide-react";
+import { GraduationCap, MapPin, Quote, Shield, Star, Users } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
-import { SchoolCard } from "@/components/SchoolCard";
 import { CollegeCard } from "@/components/CollegeCard";
 import { LeadCaptureStrip } from "@/components/LeadCaptureStrip";
 import { HeroSearch } from "@/components/home/HeroSearch";
+import { HeroSlider } from "@/components/home/HeroSlider";
 import { RankingBanner } from "@/components/home/RankingBanner";
-import { RankingRail } from "@/components/home/RankingRail";
+import { SchoolGrid } from "@/components/home/SchoolGrid";
 import { SectionHeading } from "@/components/home/SectionHeading";
 import { SpotlightCard } from "@/components/home/SpotlightCard";
+import { Faq } from "@/components/home/Faq";
 import { useColleges, useRankings, useRegions, useSchools } from "@/hooks/useSchools";
 import { schools as seedSchools } from "@/data/schools";
+import { useT } from "@/i18n";
+import type { TranslationKey } from "@/i18n/translations";
 import parentMariam from "@/assets/parent-mariam.jpg";
 import parentJohn from "@/assets/parent-john.jpg";
 import parentFatma from "@/assets/parent-fatma.jpg";
@@ -39,17 +42,28 @@ const testimonials = [
   },
 ];
 
-const rotatingWords = ["Sekondari", "A-Level", "Vyuo"];
+const rotatingWords: TranslationKey[] = ["hero.word.secondary", "hero.word.alevel", "hero.word.boarding", "hero.word.day"];
 
-const stats = [
-  { icon: GraduationCap, label: "Shule na vyuo", value: "150+" },
-  { icon: Users, label: "Wanafunzi waliosaidiwa", value: "7,000+" },
-  { icon: Shield, label: "Shule zimethibitishwa", value: "100%" },
-  { icon: Star, label: "Wastani wa wazazi", value: "4.7/5" },
+const stats: { icon: typeof GraduationCap; key: TranslationKey; value: string }[] = [
+  { icon: GraduationCap, key: "home.stats.schools", value: "150+" },
+  { icon: Users, key: "home.stats.students", value: "7,000+" },
+  { icon: Shield, key: "home.stats.verified", value: "100%" },
+  { icon: Star, key: "home.stats.rating", value: "4.7/5" },
 ];
+
+/** Section titles for the ranking rails the API (or the bundled fallback) returns. */
+const railTitleKeys: Record<string, TranslationKey> = {
+  "top-overall": "rail.top-overall",
+  "top-girls": "rail.top-girls",
+  "top-boys": "rail.top-boys",
+  "top-boarding": "rail.top-boarding",
+  "top-day": "rail.top-day",
+  "top-value": "rail.top-value",
+};
 
 const Index = () => {
   const [word, setWord] = useState(0);
+  const t = useT();
 
   const { data: regions = [] } = useRegions();
   const { data: rails = [] } = useRankings();
@@ -62,8 +76,10 @@ const Index = () => {
   }, []);
 
   const featuredSchools = featured?.items?.length ? featured.items : seedSchools;
-  const spotlight = rails[0]?.schools?.[0] ?? featuredSchools[0];
-  const [primaryRail, ...otherRails] = rails;
+  const spotlight = rails.find((rail) => rail.id === "top-overall")?.schools?.[0] ?? featuredSchools[0];
+  const typeRails = ["top-girls", "top-boys", "top-boarding", "top-day", "top-value"]
+    .map((id) => rails.find((rail) => rail.id === id))
+    .filter((rail): rail is NonNullable<typeof rail> => Boolean(rail));
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,115 +90,67 @@ const Index = () => {
       />
       <Navbar />
 
-      {/* Hero — headline, one line of promise, then the search bar. */}
-      <section className="relative overflow-hidden px-4 pb-6 pt-14 sm:px-6 sm:pt-20">
-        <div className="mx-auto max-w-[1000px] text-center">
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent("open-ai-chat"))}
-            className="mx-auto mb-7 flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-[13px] font-medium text-foreground transition hover:border-primary/50 hover:text-primary"
-          >
-            <MessageCircle className="h-3.5 w-3.5 text-primary" />
-            Uliza mshauri wetu — ni bure
-          </button>
+      {/* Hero — real campus photos behind the headline, then the search bar. */}
+      <section className="relative pb-20 pt-[60px] sm:pt-[86px]">
+        <HeroSlider />
 
-          <h1 className="display-xl text-foreground">
-            Tafuta, linganisha na uunganishwe
-            <br className="hidden sm:block" /> na{" "}
-            <span className="text-primary">shule bora za {rotatingWords[word]}</span>
-            <br className="hidden sm:block" /> Tanzania
+        <div className="wrap relative text-center">
+          <h1 className="display-xl mx-auto max-w-[980px] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]">
+            {t("hero.titleA")}
+            <br className="hidden sm:block" />{" "}
+            <span className="text-primary">{t("hero.titleHighlight", { word: t(rotatingWords[word]) })}</span>{" "}
+            {t("hero.titleB")}
+            <br className="hidden sm:block" /> {t("hero.titleC")}
           </h1>
 
-          <p className="mx-auto mt-6 max-w-[640px] text-[1.0625rem] leading-relaxed text-muted-foreground">
-            Classmate inawapa wazazi taarifa za bure, kamili na zinazosasishwa — ada halisi,
-            matokeo ya mitihani na mazingira ya shule — ili kumpata mtoto shule sahihi.
+          <p className="mx-auto mt-6 max-w-[700px] text-[16px] leading-[1.6] text-white/90 drop-shadow">
+            {t("hero.subtitleA")}
+            <br className="hidden md:block" /> {t("hero.subtitleB")}
           </p>
 
-          <div className="mt-10">
-            <HeroSearch regions={regions} />
+          <div className="mt-14">
+            <HeroSearch regions={regions} onDark />
           </div>
         </div>
       </section>
 
+      {spotlight && <SpotlightCard school={spotlight} />}
+
+      <RankingBanner year={new Date().getFullYear() + 1} />
+
+      {typeRails.map((rail, index) => (
+        <SchoolGrid
+          key={rail.id}
+          eyebrow={index === 0 ? t("rail.byType") : undefined}
+          title={railTitleKeys[rail.id] ? t(railTitleKeys[rail.id]) : rail.title}
+          schools={rail.schools}
+        />
+      ))}
+
       {/* Trust strip */}
-      <section className="border-y border-border/70 bg-card py-5">
-        <div className="mx-auto flex max-w-[1320px] flex-wrap items-center justify-center gap-x-10 gap-y-4 px-4 sm:px-6">
+      <section className="py-10">
+        <div className="wrap flex flex-wrap items-center justify-center gap-x-12 gap-y-4 border-y border-dashed border-[#9a9a9a] py-7">
           {stats.map((stat) => (
-            <div key={stat.label} className="flex items-center gap-2.5">
-              <stat.icon className="h-[18px] w-[18px] text-primary" />
-              <span className="font-display text-[0.9375rem] font-bold text-foreground">{stat.value}</span>
-              <span className="text-[13px] text-muted-foreground">{stat.label}</span>
+            <div key={stat.key} className="flex items-center gap-2.5">
+              <stat.icon className="h-5 w-5 text-primary" />
+              <span className="text-[16px] font-bold text-foreground">{stat.value}</span>
+              <span className="text-[15px] text-foreground">{t(stat.key)}</span>
             </div>
           ))}
         </div>
       </section>
 
-      <RankingBanner year={new Date().getFullYear() + 1} schoolCount={Math.max(featured?.total ?? 0, seedSchools.length)} />
-
-      {/* Ranking rails — the first carries the section eyebrow. */}
-      {primaryRail && (
-        <RankingRail
-          eyebrow="Kwa aina ya shule"
-          title={primaryRail.title}
-          subtitle={primaryRail.subtitle}
-          schools={primaryRail.schools}
-          action={{ label: "Angalia zote", to: "/shule?sort=results" }}
-        />
-      )}
-
-      {spotlight && <SpotlightCard school={spotlight} />}
-
-      {otherRails.slice(0, 2).map((rail) => (
-        <RankingRail
-          key={rail.id}
-          title={rail.title}
-          subtitle={rail.subtitle}
-          schools={rail.schools}
-          action={{ label: "Angalia zote", to: "/shule" }}
-        />
-      ))}
-
-      <LeadCaptureStrip />
-
-      {/* Featured grid */}
-      <section className="py-12 sm:py-16">
-        <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
-          <SectionHeading
-            eyebrow="Zinazoangaliwa zaidi"
-            title="Shule maarufu kwa wazazi"
-            subtitle="Zilizotembelewa na kuombwa zaidi wiki hii."
-            action={{ label: "Shule zote", to: "/shule" }}
-          />
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredSchools.slice(0, 6).map((school) => (
-              <SchoolCard key={school.id} school={school} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {otherRails.slice(2).map((rail) => (
-        <RankingRail
-          key={rail.id}
-          title={rail.title}
-          subtitle={rail.subtitle}
-          schools={rail.schools}
-          action={{ label: "Angalia zote", to: "/shule" }}
-        />
-      ))}
-
       {/* Colleges */}
       {colleges.length > 0 && (
-        <section className="bg-card py-12 sm:py-16">
-          <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
+        <section className="py-12">
+          <div className="wrap">
             <SectionHeading
-              eyebrow="Baada ya sekondari"
-              title="Vyuo na taasisi za ufundi"
-              subtitle="Stashahada, shahada na mafunzo ya vitendo kote nchini."
-              action={{ label: "Vyuo vyote", to: "/shule?tab=vyuo" }}
+              eyebrow={t("home.colleges.eyebrow")}
+              title={t("home.colleges.title")}
+              action={{ label: t("home.colleges.action"), to: "/shule?tab=colleges" }}
             />
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {colleges.slice(0, 4).map((college) => (
+            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {colleges.slice(0, 3).map((college) => (
                 <CollegeCard key={college.id} college={college} />
               ))}
             </div>
@@ -191,69 +159,52 @@ const Index = () => {
       )}
 
       {/* Parents */}
-      <section className="overflow-hidden py-12 sm:py-16">
-        <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
-          <SectionHeading eyebrow="Maoni ya wazazi" title="Waliokwisha pata shule" />
-        </div>
-        <div className="relative mt-8 w-full">
-          <div className="flex w-max animate-marquee gap-5">
-            {[0, 1].flatMap((set) =>
-              testimonials.map((entry) => (
-                <figure
-                  key={entry.name + set}
-                  className="flex w-[320px] shrink-0 flex-col justify-between rounded-[20px] bg-card p-5 shadow-[0_2px_14px_-8px_rgba(0,0,0,0.25)]"
-                >
-                  <Quote className="h-5 w-5 text-primary/35" />
-                  <blockquote className="mt-3 text-[0.9375rem] leading-relaxed text-foreground/85">
-                    {entry.text}
-                  </blockquote>
-                  <figcaption className="mt-4 flex items-center gap-3">
-                    <img src={entry.image} alt="" className="h-9 w-9 rounded-full object-cover" />
-                    <span className="leading-tight">
-                      <span className="block text-[13px] font-semibold text-foreground">{entry.name}</span>
-                      <span className="block text-[12px] text-muted-foreground">{entry.role}</span>
-                    </span>
-                  </figcaption>
-                </figure>
-              )),
-            )}
+      <section className="py-12">
+        <div className="wrap">
+          <SectionHeading eyebrow={t("home.parents.eyebrow")} title={t("home.parents.title")} />
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {testimonials.map((entry) => (
+              <figure key={entry.name} className="tile flex flex-col justify-between p-7">
+                <Quote className="h-6 w-6 text-primary/40" />
+                <blockquote className="mt-4 text-[16px] leading-[1.7] text-foreground">{entry.text}</blockquote>
+                <figcaption className="mt-6 flex items-center gap-3 border-t border-[#ededed] pt-5">
+                  <img src={entry.image} alt="" className="h-11 w-11 rounded-full object-cover" />
+                  <span className="leading-tight">
+                    <span className="block text-[15px] font-semibold text-foreground">{entry.name}</span>
+                    <span className="block text-[13px] text-muted-foreground">{entry.role}</span>
+                  </span>
+                </figcaption>
+              </figure>
+            ))}
           </div>
         </div>
       </section>
+
+      <LeadCaptureStrip />
 
       {/* Regions */}
-      <section className="pb-16">
-        <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
-          <div className="rounded-[24px] bg-secondary px-6 py-12 text-center sm:px-10 sm:py-16">
-            <p className="text-[13px] font-medium text-background/60">Vinjari kwa mkoa</p>
-            <h2 className="display-md mt-3 text-background">Shule zilizo karibu nawe</h2>
-
-            <div className="mx-auto mt-8 flex max-w-[860px] flex-wrap justify-center gap-2.5">
-              {regions.map((region) => (
-                <Link
-                  key={region.name}
-                  to={`/shule?region=${encodeURIComponent(region.name)}`}
-                  className="group flex items-center gap-2 rounded-full bg-background/10 px-4 py-2.5 text-[0.9375rem] font-medium text-background transition hover:bg-background hover:text-foreground"
-                >
-                  <MapPin className="h-3.5 w-3.5 opacity-60" />
-                  {region.name}
-                  {region.schoolCount > 0 && (
-                    <span className="text-[12px] opacity-60">{region.schoolCount}</span>
-                  )}
-                </Link>
-              ))}
-            </div>
-
-            <Link
-              to="/omba-nafasi"
-              className="mt-10 inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-[0.9375rem] font-semibold text-primary-foreground transition hover:bg-primary/90"
-            >
-              Omba tukusaidie kuchagua
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+      <section className="py-12">
+        <div className="wrap">
+          <SectionHeading eyebrow={t("home.regions.eyebrow")} title={t("home.regions.title")} />
+          <div className="mt-8 flex flex-wrap gap-3">
+            {regions.map((region) => (
+              <Link
+                key={region.name}
+                to={`/shule?region=${encodeURIComponent(region.name)}`}
+                className="flex items-center gap-2 rounded-md border border-[#cfcfcf] bg-card px-4 py-2.5 text-[15px] text-foreground transition hover:border-primary hover:text-primary"
+              >
+                <MapPin className="h-4 w-4" />
+                {region.name}
+                {region.schoolCount > 0 && <span className="text-muted-foreground">({region.schoolCount})</span>}
+              </Link>
+            ))}
           </div>
         </div>
       </section>
+
+      <div id="maswali">
+        <Faq />
+      </div>
 
       <Footer />
     </div>

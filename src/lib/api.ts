@@ -7,7 +7,9 @@
  *   - `https://api.example.com/api` → straight to the VPS. That web origin must be listed in
  *     the API's `CORS_ORIGIN`.
  */
-const RAW_BASE = (import.meta.env.VITE_API_URL ?? "/api").trim();
+// `||` rather than `??`: an unset VITE_API_URL arrives as "" from .env, and an empty base
+// would strip the /api prefix and send every call to the web root.
+const RAW_BASE = (import.meta.env.VITE_API_URL || "/api").trim() || "/api";
 
 /** Base URL with any trailing slash removed. */
 export const API_BASE_URL = RAW_BASE.replace(/\/+$/, "");

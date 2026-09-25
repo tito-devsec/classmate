@@ -8,6 +8,8 @@ import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { useColleges, useRegions, useSchools } from "@/hooks/useSchools";
 import type { SchoolQuery } from "@/services/schools";
+import { useT } from "@/i18n";
+import type { TranslationKey } from "@/i18n/translations";
 
 type Category = "schools" | "colleges" | "study-abroad";
 
@@ -15,12 +17,12 @@ const levels = ["O-Level", "A-Level"] as const;
 const boardingTypes = ["Boarding", "Day"] as const;
 const genders = ["Boys", "Girls", "Mixed"] as const;
 
-const sortOptions: { value: NonNullable<SchoolQuery["sort"]>; label: string }[] = [
-  { value: "rating", label: "Wastani wa juu" },
-  { value: "results", label: "Matokeo bora" },
-  { value: "fee-asc", label: "Ada ndogo kwanza" },
-  { value: "fee-desc", label: "Ada kubwa kwanza" },
-  { value: "name", label: "Jina (A–Z)" },
+const sortOptions: { value: NonNullable<SchoolQuery["sort"]>; key: TranslationKey }[] = [
+  { value: "rating", key: "listing.sort.rating" },
+  { value: "results", key: "listing.sort.results" },
+  { value: "fee-asc", key: "listing.sort.feeAsc" },
+  { value: "fee-desc", key: "listing.sort.feeDesc" },
+  { value: "name", key: "listing.sort.name" },
 ];
 
 const abroadUniversities = [
@@ -32,10 +34,10 @@ const abroadUniversities = [
   { name: "Universiti Malaya", country: "Malaysia", flag: "🇲🇾", programs: "IT, Engineering, Business", tuition: "USD 4,500 - 7,500 / mwaka", img: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80" },
 ];
 
-const tabs: { id: Category; label: string; icon: typeof GraduationCap }[] = [
-  { id: "schools", label: "Shule", icon: GraduationCap },
-  { id: "colleges", label: "Vyuo", icon: Building2 },
-  { id: "study-abroad", label: "Masomo nje", icon: Globe },
+const tabs: { id: Category; key: TranslationKey; icon: typeof GraduationCap }[] = [
+  { id: "schools", key: "listing.tab.schools", icon: GraduationCap },
+  { id: "colleges", key: "listing.tab.colleges", icon: Building2 },
+  { id: "study-abroad", key: "listing.tab.abroad", icon: Globe },
 ];
 
 const readTab = (value: string | null): Category => {
@@ -46,6 +48,7 @@ const readTab = (value: string | null): Category => {
 
 const SchoolListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const t = useT();
 
   const [category, setCategory] = useState<Category>(readTab(searchParams.get("tab")));
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
@@ -140,11 +143,14 @@ const SchoolListing = () => {
   };
 
   const chip = (active: boolean) =>
-    `rounded-full border px-4 py-2 text-[13px] font-medium transition ${
+    `rounded-md border px-4 py-2 text-[15px] transition ${
       active
         ? "border-primary bg-primary text-primary-foreground"
-        : "border-border bg-card text-foreground hover:border-foreground/30"
+        : "border-[#cfcfcf] bg-card text-foreground hover:border-primary hover:text-primary"
     }`;
+
+  const genderLabel = (value: (typeof genders)[number]) =>
+    value === "Boys" ? t("listing.boys") : value === "Girls" ? t("listing.girls") : t("listing.mixed");
 
   return (
     <div className="min-h-screen bg-background">
@@ -169,19 +175,17 @@ const SchoolListing = () => {
 
       {/* Page head */}
       <section className="border-b border-border/70 bg-card">
-        <div className="mx-auto max-w-[1320px] px-4 py-10 sm:px-6 sm:py-14">
-          <p className="eyebrow">Orodha ya Classmate</p>
+        <div className="wrap py-10 sm:py-14">
+          <p className="eyebrow">{t("listing.eyebrow")}</p>
           <h1 className="display-lg mt-2 text-foreground">
             {category === "schools"
-              ? "Shule za sekondari Tanzania"
+              ? t("listing.schools")
               : category === "colleges"
-                ? "Vyuo na taasisi za ufundi"
-                : "Masomo nje ya nchi"}
+                ? t("listing.colleges")
+                : t("listing.abroad")}
           </h1>
-          <p className="mt-3 max-w-2xl text-[0.9375rem] text-muted-foreground">
-            {category === "study-abroad"
-              ? "Vyuo vya kimataifa unavyoweza kuomba kupitia Classmate — tunakuongoza hatua kwa hatua."
-              : "Chuja kwa mkoa, kiwango, jinsia na ada. Taarifa zote ni za bure kwa wazazi."}
+          <p className="mt-3 max-w-2xl text-[16px] text-foreground">
+            {category === "study-abroad" ? t("listing.introAbroad") : t("listing.introSchools")}
           </p>
 
           <div className="mt-7 inline-flex rounded-full bg-muted p-1">
@@ -193,12 +197,12 @@ const SchoolListing = () => {
                   setCategory(tab.id);
                   setSearch("");
                 }}
-                className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold transition sm:px-5 ${
+                className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-[15px] font-semibold transition sm:px-5 ${
                   category === tab.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <tab.icon className="h-4 w-4" />
-                {tab.label}
+                {t(tab.key)}
               </button>
             ))}
           </div>
@@ -209,26 +213,26 @@ const SchoolListing = () => {
         <>
           {/* Search + filters */}
           <section className="sticky top-[72px] z-30 border-b border-border/70 bg-background/95 backdrop-blur">
-            <div className="mx-auto max-w-[1320px] px-4 py-4 sm:px-6">
+            <div className="wrap py-4">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="relative min-w-0 flex-1 sm:max-w-md">
                   <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
-                    placeholder={category === "schools" ? "Tafuta shule au mkoa…" : "Tafuta chuo au programu…"}
-                    aria-label="Tafuta"
-                    className="h-12 w-full rounded-full border border-border bg-card pl-11 pr-4 text-[0.9375rem] outline-none ring-primary/25 focus:ring-2"
+                    placeholder={category === "schools" ? t("listing.searchSchools") : t("listing.searchColleges")}
+                    aria-label={t("nav.search")}
+                    className="h-12 w-full rounded-full border border-border bg-card pl-11 pr-4 text-[15px] outline-none ring-primary/25 focus:ring-2"
                   />
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setFiltersOpen((value) => !value)}
-                  className="flex h-12 items-center gap-2 rounded-full border border-border bg-card px-5 text-[0.9375rem] font-medium transition hover:border-foreground/30"
+                  className="flex h-12 items-center gap-2 rounded-full border border-border bg-card px-5 text-[15px] font-medium transition hover:border-foreground/30"
                 >
                   <SlidersHorizontal className="h-4 w-4" />
-                  Vichujio
+                  {t("listing.filters")}
                   {activeFilters > 0 && (
                     <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-bold text-primary-foreground">
                       {activeFilters}
@@ -237,16 +241,16 @@ const SchoolListing = () => {
                 </button>
 
                 {category === "schools" && (
-                  <label className="ml-auto hidden items-center gap-2 text-[13px] text-muted-foreground sm:flex">
-                    Panga:
+                  <label className="ml-auto hidden items-center gap-2 text-[14px] text-muted-foreground sm:flex">
+                    {t("listing.sortBy")}
                     <select
                       value={sort}
                       onChange={(event) => setSort(event.target.value as NonNullable<SchoolQuery["sort"]>)}
-                      className="h-12 rounded-full border border-border bg-card px-4 text-[0.9375rem] font-medium text-foreground outline-none"
+                      className="h-12 rounded-full border border-border bg-card px-4 text-[15px] font-medium text-foreground outline-none"
                     >
                       {sortOptions.map((option) => (
                         <option key={option.value} value={option.value}>
-                          {option.label}
+                          {t(option.key)}
                         </option>
                       ))}
                     </select>
@@ -257,10 +261,10 @@ const SchoolListing = () => {
               {filtersOpen && (
                 <div className="mt-4 space-y-4 rounded-2xl border border-border bg-card p-4">
                   <div>
-                    <p className="mb-2 text-[13px] font-semibold text-foreground">Mkoa</p>
+                    <p className="mb-2 text-[14px] font-semibold text-foreground">{t("listing.filter.region")}</p>
                     <div className="flex flex-wrap gap-2">
                       <button type="button" className={chip(!region)} onClick={() => setRegion("")}>
-                        Yote
+                        {t("listing.all")}
                       </button>
                       {regions.map((entry) => (
                         <button
@@ -278,10 +282,10 @@ const SchoolListing = () => {
                   {category === "schools" ? (
                     <>
                       <div>
-                        <p className="mb-2 text-[13px] font-semibold text-foreground">Kiwango</p>
+                        <p className="mb-2 text-[14px] font-semibold text-foreground">{t("listing.filter.level")}</p>
                         <div className="flex flex-wrap gap-2">
                           <button type="button" className={chip(!level)} onClick={() => setLevel("")}>
-                            Vyote
+                            {t("listing.allLevels")}
                           </button>
                           {levels.map((entry) => (
                             <button
@@ -297,10 +301,10 @@ const SchoolListing = () => {
                       </div>
 
                       <div>
-                        <p className="mb-2 text-[13px] font-semibold text-foreground">Aina</p>
+                        <p className="mb-2 text-[14px] font-semibold text-foreground">{t("listing.filter.type")}</p>
                         <div className="flex flex-wrap gap-2">
                           <button type="button" className={chip(!boarding)} onClick={() => setBoarding("")}>
-                            Zote
+                            {t("listing.allTypes")}
                           </button>
                           {boardingTypes.map((entry) => (
                             <button
@@ -309,17 +313,17 @@ const SchoolListing = () => {
                               className={chip(boarding === entry)}
                               onClick={() => setBoarding(boarding === entry ? "" : entry)}
                             >
-                              {entry === "Boarding" ? "Bweni" : "Kutwa"}
+                              {entry === "Boarding" ? t("listing.boarding") : t("listing.day")}
                             </button>
                           ))}
                         </div>
                       </div>
 
                       <div>
-                        <p className="mb-2 text-[13px] font-semibold text-foreground">Jinsia</p>
+                        <p className="mb-2 text-[14px] font-semibold text-foreground">{t("listing.filter.gender")}</p>
                         <div className="flex flex-wrap gap-2">
                           <button type="button" className={chip(!gender)} onClick={() => setGender("")}>
-                            Zote
+                            {t("listing.allTypes")}
                           </button>
                           {genders.map((entry) => (
                             <button
@@ -328,7 +332,7 @@ const SchoolListing = () => {
                               className={chip(gender === entry)}
                               onClick={() => setGender(gender === entry ? "" : entry)}
                             >
-                              {entry === "Boys" ? "Wavulana" : entry === "Girls" ? "Wasichana" : "Mchanganyiko"}
+                              {genderLabel(entry)}
                             </button>
                           ))}
                         </div>
@@ -336,10 +340,10 @@ const SchoolListing = () => {
                     </>
                   ) : (
                     <div>
-                      <p className="mb-2 text-[13px] font-semibold text-foreground">Aina ya chuo</p>
+                      <p className="mb-2 text-[14px] font-semibold text-foreground">{t("listing.filter.collegeType")}</p>
                       <div className="flex flex-wrap gap-2">
                         <button type="button" className={chip(!collegeCategory)} onClick={() => setCollegeCategory("")}>
-                          Vyote
+                          {t("listing.allLevels")}
                         </button>
                         {["Institute", "College"].map((entry) => (
                           <button
@@ -348,7 +352,7 @@ const SchoolListing = () => {
                             className={chip(collegeCategory === entry)}
                             onClick={() => setCollegeCategory(collegeCategory === entry ? "" : entry)}
                           >
-                            {entry === "Institute" ? "Taasisi" : "Chuo"}
+                            {entry === "Institute" ? t("card.institute") : t("card.college")}
                           </button>
                         ))}
                       </div>
@@ -359,10 +363,10 @@ const SchoolListing = () => {
                     <button
                       type="button"
                       onClick={clearFilters}
-                      className="flex items-center gap-1.5 text-[13px] font-semibold text-primary hover:underline"
+                      className="flex items-center gap-1.5 text-[14px] font-semibold text-primary hover:underline"
                     >
                       <X className="h-3.5 w-3.5" />
-                      Ondoa vichujio vyote
+                      {t("listing.clearFilters")}
                     </button>
                   )}
                 </div>
@@ -372,16 +376,16 @@ const SchoolListing = () => {
 
           {/* Results */}
           <section className="py-8 sm:py-10">
-            <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
+            <div className="wrap">
               <div className="mb-6 flex flex-wrap items-center gap-3">
-                <p className="text-[0.9375rem] text-muted-foreground">
+                <p className="text-[15px] text-muted-foreground">
                   <span className="font-semibold text-foreground">{totalResults}</span>{" "}
-                  {category === "schools" ? "shule zimepatikana" : "vyuo vimepatikana"}
+                  {category === "schools" ? t("listing.foundSchools") : t("listing.foundColleges")}
                 </p>
                 {schoolPage?.offline && category === "schools" && (
-                  <span className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-[12px] text-muted-foreground">
+                  <span className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-[13px] text-muted-foreground">
                     <WifiOff className="h-3.5 w-3.5" />
-                    Orodha iliyohifadhiwa — seva haipatikani
+                    {t("listing.offline")}
                   </span>
                 )}
               </div>
@@ -389,9 +393,9 @@ const SchoolListing = () => {
               {loading ? (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {Array.from({ length: 6 }).map((_, index) => (
-                    <div key={index} className="overflow-hidden rounded-[20px] bg-card shadow-sm">
-                      <div className="aspect-[16/11] animate-pulse bg-muted" />
-                      <div className="space-y-3 p-4">
+                    <div key={index} className="tile">
+                      <div className="h-[300px] animate-pulse bg-muted" />
+                      <div className="space-y-3 p-6">
                         <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
                         <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
                         <div className="h-8 w-full animate-pulse rounded bg-muted" />
@@ -409,17 +413,15 @@ const SchoolListing = () => {
 
               {!loading && totalResults === 0 && (
                 <div className="rounded-2xl border border-dashed border-border py-16 text-center">
-                  <p className="font-display text-lg font-bold text-foreground">Hakuna matokeo</p>
-                  <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-                    Jaribu kuondoa baadhi ya vichujio au badilisha maneno ya utafutaji.
-                  </p>
+                  <p className="text-lg font-bold text-foreground">{t("listing.emptyTitle")}</p>
+                  <p className="mt-1 text-[15px] text-muted-foreground">{t("listing.emptyBody")}</p>
                   {activeFilters > 0 && (
                     <button
                       type="button"
                       onClick={clearFilters}
-                      className="mt-5 rounded-full bg-primary px-6 py-2.5 text-[0.9375rem] font-semibold text-primary-foreground"
+                      className="mt-5 rounded-full bg-primary px-6 py-2.5 text-[15px] font-semibold text-primary-foreground"
                     >
-                      Ondoa vichujio
+                      {t("listing.clear")}
                     </button>
                   )}
                 </div>
@@ -432,34 +434,31 @@ const SchoolListing = () => {
       {/* Study abroad */}
       {category === "study-abroad" && (
         <section className="py-10 sm:py-14">
-          <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
+          <div className="wrap">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {abroadUniversities.map((university) => (
-                <article
-                  key={university.name}
-                  className="card-hover group overflow-hidden rounded-[20px] bg-card shadow-[0_2px_14px_-8px_rgba(0,0,0,0.25)]"
-                >
-                  <div className="relative aspect-[16/11] overflow-hidden">
+                <article key={university.name} className="tile card-hover group">
+                  <div className="relative h-[300px] overflow-hidden">
                     <img
                       src={university.img}
                       alt={university.name}
                       loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                     />
-                    <span className="absolute right-3 top-3 rounded-full bg-card px-2.5 py-1 text-[11px] font-semibold shadow-sm">
+                    <span className="absolute right-3 top-3 rounded-full bg-card px-2.5 py-1 text-[13px] font-semibold shadow-sm">
                       {university.flag} {university.country}
                     </span>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-display text-[1.0625rem] font-bold text-foreground">{university.name}</h3>
-                    <p className="mt-1.5 line-clamp-2 text-[13px] text-muted-foreground">{university.programs}</p>
-                    <p className="mt-3 font-display text-[0.9375rem] font-bold text-foreground">{university.tuition}</p>
+                  <div className="p-6">
+                    <h3 className="text-[22px] font-semibold text-foreground">{university.name}</h3>
+                    <p className="mt-1.5 line-clamp-2 text-[15px] text-muted-foreground">{university.programs}</p>
+                    <p className="mt-3 text-[15px] font-bold text-foreground">{university.tuition}</p>
                     <button
                       type="button"
                       onClick={() => document.getElementById("study-abroad-form")?.scrollIntoView({ behavior: "smooth" })}
-                      className="mt-4 w-full rounded-full bg-primary py-2.5 text-[13px] font-semibold text-primary-foreground transition hover:bg-primary/90"
+                      className="mt-4 w-full rounded-full bg-primary py-2.5 text-[15px] font-semibold text-primary-foreground transition hover:bg-primary/90"
                     >
-                      Omba sasa
+                      {t("listing.applyNow")}
                     </button>
                   </div>
                 </article>
@@ -467,76 +466,69 @@ const SchoolListing = () => {
             </div>
 
             <div className="mx-auto mt-14 max-w-lg text-center">
-              <h2 className="display-md text-foreground">Jaza fomu ya maombi</h2>
-              <p className="mt-2 text-[0.9375rem] text-muted-foreground">
-                Tutakuongoza hatua kwa hatua kwenye chuo unachokitaka.
-              </p>
+              <h2 className="display-md text-foreground">{t("listing.abroadFormTitle")}</h2>
+              <p className="mt-2 text-[15px] text-muted-foreground">{t("listing.abroadFormBody")}</p>
             </div>
 
             <div id="study-abroad-form" className="mx-auto mt-6 max-w-lg scroll-mt-28">
               {studyAbroadSubmitted ? (
-                <div className="animate-fade-in rounded-2xl bg-card p-8 text-center shadow-sm">
+                <div className="tile animate-fade-in p-8 text-center">
                   <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-success/10">
                     <CheckCircle className="h-5 w-5 text-success" />
                   </div>
-                  <h3 className="font-display text-lg font-bold text-foreground">Asante!</h3>
-                  <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-                    Tutawasiliana nawe hivi karibuni kuhusu fursa za masomo nje ya nchi.
-                  </p>
+                  <h3 className="text-lg font-bold text-foreground">{t("listing.form.thanks")}</h3>
+                  <p className="mt-1 text-[15px] text-muted-foreground">{t("listing.form.thanksBody")}</p>
                 </div>
               ) : (
-                <form
-                  onSubmit={handleStudyAbroadSubmit}
-                  className="animate-fade-in space-y-4 rounded-2xl bg-card p-6 shadow-sm"
-                >
+                <form onSubmit={handleStudyAbroadSubmit} className="tile animate-fade-in space-y-4 p-6">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <label className="space-y-2">
-                      <span className="text-[13px] font-medium text-foreground">Jina kamili *</span>
+                      <span className="text-[14px] font-medium text-foreground">{t("listing.form.fullName")}</span>
                       <input
                         required
-                        placeholder="Jina lako"
-                        className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none ring-primary/25 focus:ring-2"
+                        placeholder={t("listing.form.fullNamePlaceholder")}
+                        className="h-11 w-full rounded-xl border border-border bg-background px-3 text-[15px] outline-none ring-primary/25 focus:ring-2"
                       />
                     </label>
                     <label className="space-y-2">
-                      <span className="text-[13px] font-medium text-foreground">Namba ya simu *</span>
+                      <span className="text-[14px] font-medium text-foreground">{t("listing.form.phone")}</span>
                       <input
                         required
                         type="tel"
                         placeholder="+255 7XX XXX XXX"
-                        className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none ring-primary/25 focus:ring-2"
+                        className="h-11 w-full rounded-xl border border-border bg-background px-3 text-[15px] outline-none ring-primary/25 focus:ring-2"
                       />
                     </label>
                   </div>
                   <label className="block space-y-2">
-                    <span className="text-[13px] font-medium text-foreground">Barua pepe *</span>
+                    <span className="text-[14px] font-medium text-foreground">{t("listing.form.email")}</span>
                     <input
                       required
                       type="email"
                       placeholder="email@example.com"
-                      className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none ring-primary/25 focus:ring-2"
+                      className="h-11 w-full rounded-xl border border-border bg-background px-3 text-[15px] outline-none ring-primary/25 focus:ring-2"
                     />
                   </label>
                   <label className="block space-y-2">
-                    <span className="text-[13px] font-medium text-foreground">Nchi unayoitaka</span>
+                    <span className="text-[14px] font-medium text-foreground">{t("listing.form.country")}</span>
                     <input
-                      placeholder="Mfano: UK, Canada, USA"
-                      className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none ring-primary/25 focus:ring-2"
+                      placeholder={t("listing.form.countryPlaceholder")}
+                      className="h-11 w-full rounded-xl border border-border bg-background px-3 text-[15px] outline-none ring-primary/25 focus:ring-2"
                     />
                   </label>
                   <label className="block space-y-2">
-                    <span className="text-[13px] font-medium text-foreground">Maelezo mengine</span>
+                    <span className="text-[14px] font-medium text-foreground">{t("listing.form.notes")}</span>
                     <textarea
                       rows={3}
-                      placeholder="Kiwango cha masomo, bajeti, n.k."
-                      className="w-full resize-none rounded-xl border border-border bg-background p-3 text-sm outline-none ring-primary/25 focus:ring-2"
+                      placeholder={t("listing.form.notesPlaceholder")}
+                      className="w-full resize-none rounded-xl border border-border bg-background p-3 text-[15px] outline-none ring-primary/25 focus:ring-2"
                     />
                   </label>
                   <button
                     type="submit"
-                    className="w-full rounded-full bg-primary py-3 text-[0.9375rem] font-semibold text-primary-foreground transition hover:bg-primary/90"
+                    className="w-full rounded-full bg-primary py-3 text-[15px] font-semibold text-primary-foreground transition hover:bg-primary/90"
                   >
-                    Tuma maombi
+                    {t("listing.form.submit")}
                   </button>
                 </form>
               )}

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { PaywallDialog } from "@/components/PaywallDialog";
+import { useT } from "@/i18n";
 
 export const LeadCaptureStrip = () => {
   const [expanded, setExpanded] = useState(false);
@@ -19,6 +20,7 @@ export const LeadCaptureStrip = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const { toast } = useToast();
+  const t = useT();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,8 +32,8 @@ export const LeadCaptureStrip = () => {
     setShowOptions(false);
     setSubmitted(true);
     toast({
-      title: "Fomu Imetumwa!",
-      description: "Tutawasiliana nawe ndani ya masaa 24.",
+      title: t("lead.sent"),
+      description: t("lead.sentBody"),
     });
     console.log("[Classmate Track] free_option_selected", { timestamp: Date.now() });
   };
@@ -50,7 +52,7 @@ export const LeadCaptureStrip = () => {
             <Star className="h-5 w-5 text-success" />
           </div>
           <p className="font-display text-lg font-semibold text-foreground">
-            Asante! Tutawasiliana nawe hivi karibuni.
+            {t("lead.thanks")}
           </p>
         </div>
       </section>
@@ -70,10 +72,10 @@ export const LeadCaptureStrip = () => {
             </div>
             <div className="min-w-0">
               <p className="truncate font-display text-sm font-bold text-primary-foreground sm:text-base">
-                Unatafuta shule sahihi kwa mtoto wako?
+                {t("lead.headline")}
               </p>
               <p className="text-xs text-primary-foreground/70">
-                Jaza fomu fupi — tutakupigia simu ndani ya saa 24
+                {t("lead.subline")}
               </p>
             </div>
           </div>
@@ -87,8 +89,8 @@ export const LeadCaptureStrip = () => {
             }}
           >
             <Phone className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Nisaidie Kupata Shule</span>
-            <span className="sm:hidden">Jaza Fomu</span>
+            <span className="hidden sm:inline">{t("lead.cta")}</span>
+            <span className="sm:hidden">{t("lead.ctaShort")}</span>
             <ChevronDown
               className={`h-3.5 w-3.5 transition-transform duration-300 ${
                 expanded ? "rotate-180" : ""
@@ -112,10 +114,10 @@ export const LeadCaptureStrip = () => {
                   onClick={handlePaidOption}
                 >
                   <Zap className="h-5 w-5 text-primary mx-auto mb-1" />
-                  <p className="text-[10px] text-muted-foreground leading-tight">Pata Majibu ndani ya</p>
-                  <h4 className="font-display text-sm font-bold text-foreground mt-0.5">⚡ Dakika 5</h4>
+                  <p className="text-[10px] text-muted-foreground leading-tight">{t("lead.answersWithin")}</p>
+                  <h4 className="font-display text-sm font-bold text-foreground mt-0.5">{t("lead.fiveMinutes")}</h4>
                   <Button className="w-full mt-2 bg-cta hover:bg-cta/90 text-cta-foreground font-bold text-[11px] h-8" size="sm">
-                    Chagua Package
+                    {t("lead.choosePackage")}
                   </Button>
                 </div>
 
@@ -124,10 +126,10 @@ export const LeadCaptureStrip = () => {
                   onClick={handleFreeOption}
                 >
                   <Clock className="h-5 w-5 text-muted-foreground mx-auto mb-1" />
-                  <p className="text-[10px] text-muted-foreground leading-tight">Pata Majibu ndani ya</p>
-                  <h4 className="font-display text-sm font-bold text-foreground mt-0.5">🕒 Masaa 24</h4>
+                  <p className="text-[10px] text-muted-foreground leading-tight">{t("lead.answersWithin")}</p>
+                  <h4 className="font-display text-sm font-bold text-foreground mt-0.5">{t("lead.24hours")}</h4>
                   <Button variant="outline" className="w-full mt-2 text-[11px] h-8" size="sm">
-                    Endelea Bure
+                    {t("lead.continueFree")}
                   </Button>
                 </div>
               </div>
@@ -138,32 +140,32 @@ export const LeadCaptureStrip = () => {
               >
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Jina la Mzazi *</Label>
-                    <Input required placeholder="Jina lako kamili" />
+                    <Label className="text-sm font-medium">{t("lead.parentName")}</Label>
+                    <Input required placeholder={t("lead.parentNamePlaceholder")} />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Namba ya Simu *</Label>
+                    <Label className="text-sm font-medium">{t("lead.phone")}</Label>
                     <Input required type="tel" placeholder="+255 7XX XXX XXX" />
                   </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Mtoto anatafuta *</Label>
+                    <Label className="text-sm font-medium">{t("lead.lookingFor")}</Label>
                     <Select required>
                       <SelectTrigger>
                         <SelectValue placeholder="O-Level / A-Level" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="O-Level">O-Level (Kidato 1-4)</SelectItem>
-                        <SelectItem value="A-Level">A-Level (Kidato 5-6)</SelectItem>
+                        <SelectItem value="O-Level">{t("lead.oLevel")}</SelectItem>
+                        <SelectItem value="A-Level">{t("lead.aLevel")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Mwanafunzi Anatokea Wapi? *</Label>
+                    <Label className="text-sm font-medium">{t("lead.studentFrom")}</Label>
                     <Select required>
                       <SelectTrigger>
-                        <SelectValue placeholder="Mkoa anaotokea" />
+                        <SelectValue placeholder={t("lead.homeRegion")} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="dar">Dar es Salaam</SelectItem>
@@ -189,13 +191,13 @@ export const LeadCaptureStrip = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Mkoa wa Shule Anayoitaka</Label>
+                    <Label className="text-sm font-medium">{t("lead.schoolRegion")}</Label>
                     <Select>
                       <SelectTrigger>
-                        <SelectValue placeholder="Chagua mkoa (si lazima)" />
+                        <SelectValue placeholder={t("lead.chooseRegion")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="any">Popote Tanzania</SelectItem>
+                        <SelectItem value="any">{t("lead.anywhere")}</SelectItem>
                         <SelectItem value="dar">Dar es Salaam</SelectItem>
                         <SelectItem value="pwani">Pwani</SelectItem>
                         <SelectItem value="arusha">Arusha</SelectItem>
@@ -212,31 +214,31 @@ export const LeadCaptureStrip = () => {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Kidato *</Label>
+                    <Label className="text-sm font-medium">{t("lead.form")}</Label>
                     <Select required>
                       <SelectTrigger>
-                        <SelectValue placeholder="Chagua kidato" />
+                        <SelectValue placeholder={t("lead.chooseForm")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="1">Kidato cha 1</SelectItem>
-                        <SelectItem value="2">Kidato cha 2</SelectItem>
-                        <SelectItem value="3">Kidato cha 3</SelectItem>
-                        <SelectItem value="4">Kidato cha 4</SelectItem>
-                        <SelectItem value="5">Kidato cha 5</SelectItem>
-                        <SelectItem value="6">Kidato cha 6</SelectItem>
+                        <SelectItem value="1">{t("lead.formN", { n: 1 })}</SelectItem>
+                        <SelectItem value="2">{t("lead.formN", { n: 2 })}</SelectItem>
+                        <SelectItem value="3">{t("lead.formN", { n: 3 })}</SelectItem>
+                        <SelectItem value="4">{t("lead.formN", { n: 4 })}</SelectItem>
+                        <SelectItem value="5">{t("lead.formN", { n: 5 })}</SelectItem>
+                        <SelectItem value="6">{t("lead.formN", { n: 6 })}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium whitespace-nowrap">Aina ya Shule</Label>
+                    <Label className="text-sm font-medium whitespace-nowrap">{t("lead.schoolType")}</Label>
                     <Select>
                       <SelectTrigger className="min-w-0">
-                        <SelectValue placeholder="Bweni/Kutwa" />
+                        <SelectValue placeholder={t("lead.boardingDay")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Boarding">Bweni (Boarding)</SelectItem>
-                        <SelectItem value="Day">Kutwa (Day)</SelectItem>
-                        <SelectItem value="Both">Yoyote</SelectItem>
+                        <SelectItem value="Boarding">{t("lead.boarding")}</SelectItem>
+                        <SelectItem value="Day">{t("lead.day")}</SelectItem>
+                        <SelectItem value="Both">{t("lead.any")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -246,7 +248,7 @@ export const LeadCaptureStrip = () => {
                   size="lg"
                   className="w-full bg-cta hover:bg-cta/90 text-cta-foreground text-lg font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
                 >
-                  Nisaidie Kupata Shule
+                  {t("lead.cta")}
                 </Button>
               </form>
             )}

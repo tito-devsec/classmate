@@ -1,37 +1,36 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useT } from "@/i18n";
 
 interface RankingBannerProps {
   year: number;
-  schoolCount: number;
 }
 
-/** Editorial block announcing the yearly ranking — the site's signature piece of content. */
-export function RankingBanner({ year, schoolCount }: RankingBannerProps) {
+/** Announces the yearly ranking — the site's signature piece of content. */
+export function RankingBanner({ year }: RankingBannerProps) {
+  const t = useT();
+
   return (
-    <section className="py-14 sm:py-20">
-      <div className="mx-auto max-w-[1320px] px-4 text-center sm:px-6">
-        <p className="eyebrow">Orodha ya Classmate</p>
+    <section className="py-14">
+      <div className="wrap text-center">
+        <p className="eyebrow">{t("ranking.eyebrow")}</p>
 
-        <h2 className="display-xl mt-4 text-foreground">
-          Shule {schoolCount} Bora
-          <br className="hidden sm:block" /> Tanzania {year}
-        </h2>
+        <h2 className="display-xl mt-6 text-foreground">{t("ranking.title", { year })}</h2>
 
-        <p className="mx-auto mt-6 max-w-[620px] text-[1.0625rem] leading-relaxed text-muted-foreground">
-          Tunapanga shule kwa kutumia matokeo ya mitihani ya taifa, ada halisi, mazingira ya
-          kujifunzia na maoni ya wazazi. Hakuna shule inayolipia nafasi — vigezo ni vilevile kwa
-          kila shule.
+        <p className="mx-auto mt-7 max-w-[560px] text-[16px] leading-[1.6] text-foreground">
+          {t("ranking.bodyA")} <strong className="font-semibold">{t("ranking.bodyStrong")}</strong>
+          <br className="hidden sm:block" /> {t("ranking.bodyB")}
+          <br className="hidden sm:block" /> {t("ranking.bodyC")}
         </p>
 
-        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-          <span className="text-[1.0625rem] text-muted-foreground">Taarifa zaidi</span>
+        <div className="mt-20 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[20px]">
+          <span className="text-foreground">{t("ranking.more")}</span>
           <Link
             to="/shule?sort=results"
-            className="group flex items-center gap-2 text-[1.0625rem] font-semibold text-foreground underline underline-offset-4 hover:text-primary"
+            className="group flex items-center gap-2 font-semibold text-foreground underline underline-offset-4 hover:text-primary"
           >
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            Nenda kwenye orodha
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+            {t("ranking.goToList")}
           </Link>
         </div>
       </div>

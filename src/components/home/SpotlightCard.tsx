@@ -1,82 +1,78 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, MapPin, Star, Wallet } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import type { School } from "@/data/schools";
 import { feeRange, gradeFor } from "@/lib/grading";
+import { FlagTZ, MoneyBag, PinIcon, Starburst } from "@/components/icons";
+import { useT } from "@/i18n";
 
 interface SpotlightCardProps {
   school: School;
 }
 
-/** Full-bleed feature card: one school, its grade, rating, fees and location over photography. */
+/** Full-width feature card: one school, its grade, rating, fees and location over photography. */
 export function SpotlightCard({ school }: SpotlightCardProps) {
-  const grade = gradeFor(school);
+  const t = useT();
   const stars = Math.round(school.rating);
 
   return (
-    <section className="py-10 sm:py-14">
-      <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
-        <Link
-          to={`/shule/${school.id}`}
-          className="group relative block overflow-hidden rounded-[24px] shadow-[0_24px_60px_-34px_rgba(0,0,0,0.6)]"
-        >
-          <div className="relative aspect-[16/10] w-full sm:aspect-[21/9]">
+    <section className="pb-16 pt-6">
+      <div className="wrap">
+        <Link to={`/shule/${school.id}`} className="group relative block overflow-hidden rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
+          <div className="relative h-[420px] sm:h-[530px]">
             <img
               src={school.image}
               alt={school.name}
-              className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+              className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-[1.03]"
             />
             <div className="photo-scrim absolute inset-0" />
 
-            <span className="absolute left-5 top-5 flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-[11px] font-semibold text-foreground shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              Shule ya wiki
+            <span className="absolute left-0 top-0 flex items-center gap-2 rounded-br-2xl bg-card py-4 pl-7 pr-7 text-[18px] font-semibold text-foreground">
+              <Starburst className="h-5 w-5 text-teal" />
+              {t("card.recommended")}
             </span>
 
-            <div className="absolute inset-x-0 bottom-0 flex flex-col gap-4 p-5 sm:p-8 md:flex-row md:items-end md:justify-between">
+            <div className="absolute inset-x-0 bottom-0 flex flex-col gap-5 px-6 pb-8 sm:px-12 sm:pb-12 md:flex-row md:items-end md:justify-between">
               <div className="min-w-0">
-                <h3 className="font-display text-[1.75rem] font-extrabold leading-tight tracking-tight text-white sm:text-[2.5rem] md:text-[3rem]">
+                <h3 className="flex flex-wrap items-center gap-4 text-[2.25rem] font-bold leading-[1.1] text-white sm:text-[3.375rem]">
                   {school.name}
-                  <span className="ml-2 align-middle text-xl sm:text-2xl">🇹🇿</span>
+                  <FlagTZ className="h-[36px] w-[54px]" />
                 </h3>
 
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                    {grade}
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-[16px] font-bold text-primary-foreground">
+                    {gradeFor(school)}
                   </span>
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1.5">
                     {Array.from({ length: 5 }).map((_, index) => (
-                      <Star
-                        key={index}
-                        className={`h-4 w-4 ${index < stars ? "fill-white text-white" : "text-white/35"}`}
-                      />
+                      <Star key={index} className={`h-5 w-5 ${index < stars ? "fill-white text-white" : "text-white/40"}`} />
                     ))}
-                    <span className="ml-1.5 text-sm font-semibold text-white">{school.rating.toFixed(1)}</span>
+                    <span className="ml-1.5 text-[18px] font-semibold text-white">{school.rating.toFixed(1)}</span>
                   </span>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-medium text-white/90">
-                <span className="flex items-center gap-2">
-                  <Wallet className="h-4 w-4" />
+              <div className="flex flex-wrap items-center gap-x-8 gap-y-2 text-[18px] text-white">
+                <span className="flex items-center gap-2.5">
+                  <MoneyBag className="h-6 w-6" />
                   {feeRange(school.tuitionMin, school.tuitionMax)}
                 </span>
-                <span className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  {school.location}
+                <span className="flex items-center gap-2.5">
+                  <PinIcon className="h-6 w-6" />
+                  {school.region}, TZ
                 </span>
               </div>
             </div>
           </div>
         </Link>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-center">
-          <span className="text-[1.0625rem] text-muted-foreground">Taarifa zaidi</span>
+        <div className="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-center text-[20px]">
+          <span className="text-foreground">{t("spotlight.more")}</span>
           <Link
             to={`/shule/${school.id}`}
-            className="group flex items-center gap-2 text-[1.0625rem] font-semibold text-foreground underline underline-offset-4 hover:text-primary"
+            className="group flex items-center gap-2 font-semibold text-foreground underline underline-offset-4 hover:text-primary"
           >
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            Nenda {school.name}
+            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+            {t("spotlight.goTo", { name: school.name })}
           </Link>
         </div>
       </div>

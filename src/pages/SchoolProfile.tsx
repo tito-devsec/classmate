@@ -1,32 +1,99 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { MapPin, Phone, Mail, Star, BookOpen, CheckCircle, ArrowLeft, TrendingUp, Home, DollarSign, Camera, MessageSquare, Lock, Sparkles } from "lucide-react";
+import {
+  Camera,
+  CheckCircle,
+  ChevronRight,
+  Globe,
+  Heart,
+  Home,
+  Lock,
+  Mail,
+  MapPin,
+  MessageSquare,
+  PenLine,
+  Phone,
+  Plus,
+  Share2,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { schools as seedSchools, formatTZS } from "@/data/schools";
+import { AuthDialog } from "@/components/AuthDialog";
 import { PaywallDialog } from "@/components/PaywallDialog";
 import { SEO } from "@/components/SEO";
+import { FlagTZ, MoneyBag, Starburst } from "@/components/icons";
+import { schools as seedSchools, formatTZS } from "@/data/schools";
 import { useSchool } from "@/hooks/useSchools";
-import { feeRange, gradeFor } from "@/lib/grading";
+import { feeRange, gradeFor, isRecommended } from "@/lib/grading";
+import { toggleCompare, useCompareIds } from "@/lib/compare";
+import { useSession } from "@/lib/session";
+import { useT } from "@/i18n";
+import type { TranslationKey } from "@/i18n/translations";
+
+const SAVED_KEY = "classmate.saved";
+
+const readSaved = (): string[] => {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+};
+
+const tabs: { id: string; key: TranslationKey }[] = [
+  { id: "muhtasari", key: "profile.tab.overview" },
+  { id: "matokeo", key: "profile.tab.results" },
+  { id: "ada", key: "profile.tab.fees" },
+  { id: "vifaa", key: "profile.tab.facilities" },
+  { id: "programu", key: "profile.tab.programs" },
+  { id: "mawasiliano", key: "profile.tab.contact" },
+];
+
+const photoKeys: TranslationKey[] = [
+  "profile.photo.campus",
+  "profile.photo.classrooms",
+  "profile.photo.labs",
+  "profile.photo.dorms",
+  "profile.photo.sports",
+  "profile.photo.library",
+];
+
+const breadcrumbKey = {
+  Boarding: "profile.breadcrumbBoarding",
+  Day: "profile.breadcrumbDay",
+  Both: "profile.breadcrumbBoth",
+} as const;
+
+const kindQuery = { Boarding: "/shule?boarding=Boarding", Day: "/shule?boarding=Day", Both: "/shule" } as const;
 
 const SchoolProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const t = useT();
   // Live record when the API answers; the bundled catalogue covers it while offline.
   const { data: fetched } = useSchool(id);
   const school = fetched ?? seedSchools.find((s) => s.id === id);
+
+  const session = useSession();
+  const compareIds = useCompareIds();
+
   const [contactRevealed, setContactRevealed] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
-  
-
-  
+  const [authOpen, setAuthOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(tabs[0].id);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     setContactRevealed(false);
+    setActiveTab(tabs[0].id);
+    setSaved(id ? readSaved().includes(id) : false);
   }, [id]);
 
   // Show upsell after 1 minute (60s) on page
@@ -40,10 +107,10 @@ const SchoolProfile = () => {
     return (
       <div className="min-h-screen">
         <Navbar />
-        <div className="container py-20 text-center">
-          <h1 className="font-display text-2xl font-bold">School not found</h1>
+        <div className="wrap py-20 text-center">
+          <h1 className="text-2xl font-bold">{t("profile.notFound")}</h1>
           <Link to="/shule" className="mt-4 inline-block text-primary hover:underline">
-            Back to listing
+            {t("profile.backToList")}
           </Link>
         </div>
         <Footer />
@@ -52,6 +119,11 @@ const SchoolProfile = () => {
   }
 
   const perf = school.performance;
+  const grade = gradeFor(school);
+  const comparing = compareIds.includes(school.id);
+
+  /** Public site derived from the school's mail domain until the API carries a website field. */
+  const website = school.email.includes("@") ? `https://${school.email.split("@")[1]}` : null;
 
   const whatsappNumber = school.phone.replace(/[^0-9]/g, "").replace(/^0/, "255");
   const whatsappMsg = encodeURIComponent(
@@ -65,8 +137,55 @@ const SchoolProfile = () => {
     console.log("[Classmate Track] contact_revealed", { school: school.id, timestamp: Date.now() });
   };
 
+  const handleCompare = () => {
+    const result = toggleCompare(school.id);
+    if (result.full) toast.error(t("profile.compareFull"));
+    else toast.success(result.added ? t("profile.compareAdded", { name: school.name }) : t("profile.compareRemoved"));
+  };
+
+  const handleSave = () => {
+    const current = readSaved();
+    const next = current.includes(school.id) ? current.filter((entry) => entry !== school.id) : [...current, school.id];
+    try {
+      localStorage.setItem(SAVED_KEY, JSON.stringify(next));
+    } catch {
+      /* private mode */
+    }
+    setSaved(next.includes(school.id));
+    toast.success(next.includes(school.id) ? t("profile.savedToast") : t("profile.unsavedToast"));
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: school.name, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      toast.success(t("profile.linkCopied"));
+    } catch {
+      /* user dismissed the share sheet */
+    }
+  };
+
+  const jumpTo = (tabId: string) => {
+    setActiveTab(tabId);
+    document.getElementById(tabId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const typeLabel =
+    school.boardingDay === "Both"
+      ? `${t("profile.fees.boarding")} / ${t("profile.fees.day")}`
+      : school.boardingDay === "Boarding"
+        ? t("profile.fees.boarding")
+        : t("profile.fees.day");
+
+  const genderLabel =
+    school.gender === "Boys" ? t("listing.boys") : school.gender === "Girls" ? t("listing.girls") : t("listing.mixed");
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <SEO
         title={`${school.name} — ${school.location} | Classmate`}
         description={`${school.name} ni shule ya ${school.levels?.join(", ") || "sekondari"} iliyopo ${school.location}. Tazama ufaulu, ada, boarding, picha na omba nafasi kupitia Classmate.`}
@@ -84,325 +203,351 @@ const SchoolProfile = () => {
           image: school.image,
         }}
       />
-      <Navbar />
+      <Navbar variant="overlay" />
 
-      {/* Hero with school image */}
-      <section className="px-4 pt-6 sm:px-6">
-        <div className="mx-auto max-w-[1320px]">
-          <div className="relative overflow-hidden rounded-[24px]">
-            <div className="relative aspect-[16/10] sm:aspect-[21/9]">
-              {school.image ? (
-                <img src={school.image} alt={school.name} className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-muted">
-                  <BookOpen className="h-24 w-24 text-primary/20" />
-                </div>
-              )}
-              <div className="photo-scrim absolute inset-0" />
+      {/* Full-bleed hero */}
+      <section className="relative h-[560px] sm:h-[600px]">
+        <img src={school.image} alt={school.name} className="h-full w-full object-cover" />
+        <div className="photo-scrim absolute inset-0" />
 
-              <div className="absolute inset-x-0 bottom-0 flex flex-col gap-4 p-5 sm:p-8 md:flex-row md:items-end md:justify-between">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap gap-1.5">
-                    {school.levels.map((level) => (
-                      <span
-                        key={level}
-                        className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm"
-                      >
-                        {level}
-                      </span>
-                    ))}
-                  </div>
+        <div className="absolute inset-x-0 bottom-0">
+          <div className="wrap flex flex-col gap-6 pb-8 md:flex-row md:items-end md:justify-between">
+            <div className="min-w-0">
+              <h1 className="flex flex-wrap items-center gap-4 text-[2.25rem] font-bold leading-[1.1] text-white sm:text-[3.375rem]">
+                {school.name}
+                <FlagTZ className="h-[30px] w-[44px]" />
+              </h1>
 
-                  <h1 className="mt-3 font-display text-[1.75rem] font-extrabold leading-tight tracking-tight text-white sm:text-[2.5rem]">
-                    {school.name}
-                  </h1>
-
-                  <div className="mt-3 flex flex-wrap items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                      {gradeFor(school)}
+              <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-3 text-[15px] text-white">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-[15px] font-bold">{grade}</span>
+                <span className="text-white/70">•</span>
+                <button
+                  type="button"
+                  onClick={() => (session ? toast.info(t("profile.reviewsSoon")) : setAuthOpen(true))}
+                  className="flex items-center gap-2 rounded-lg bg-black/55 px-4 py-2 font-semibold backdrop-blur-sm transition hover:bg-black/70"
+                >
+                  {session ? <PenLine className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+                  {session ? t("profile.writeReview") : t("profile.loginToReview")}
+                </button>
+                {isRecommended(school) && (
+                  <>
+                    <span className="text-white/70">•</span>
+                    <span className="flex items-center gap-1.5 font-semibold">
+                      <Starburst className="h-4 w-4 text-teal" />
+                      {t("card.recommended")}
                     </span>
-                    {school.rating > 0 && (
-                      <span className="flex items-center gap-1.5 text-sm font-semibold text-white">
-                        <Star className="h-4 w-4 fill-white text-white" />
-                        {school.rating.toFixed(1)}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                  </>
+                )}
+                <span className="text-white/70">•</span>
+                <span className="flex items-center gap-1.5 font-semibold">
+                  <MapPin className="h-4 w-4" fill="currentColor" />
+                  {school.location}
+                </span>
+              </div>
+            </div>
 
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-medium text-white/90">
-                  <span className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    {feeRange(school.tuitionMin, school.tuitionMax)}
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    {school.location}
-                  </span>
-                </div>
+            <div className="flex flex-col items-start gap-4 md:items-end">
+              {website && (
+                <a href={website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-[15px] text-teal hover:underline">
+                  <Globe className="h-4 w-4" />
+                  {t("profile.website")}
+                </a>
+              )}
+              <div className="flex items-center gap-6 text-[15px] font-semibold text-white">
+                <button type="button" onClick={handleCompare} className="flex items-center gap-1 transition hover:text-teal">
+                  <Plus className="h-4 w-4" strokeWidth={2.5} />
+                  {comparing ? t("profile.comparing") : t("profile.compare")}
+                </button>
+                <button type="button" onClick={handleSave} className="flex items-center gap-1 transition hover:text-teal">
+                  <Heart className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
+                  {saved ? t("profile.saved") : t("profile.save")}
+                </button>
+                <button type="button" onClick={handleShare} className="flex items-center gap-1 transition hover:text-teal">
+                  <Share2 className="h-4 w-4" />
+                  {t("profile.share")}
+                </button>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Breadcrumb */}
+      <nav aria-label="Breadcrumb" className="wrap flex flex-wrap items-center gap-1.5 py-4 text-[13px] text-foreground">
+        <Link to="/" className="hover:text-primary">{t("nav.home")}</Link>
+        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+        <Link to={kindQuery[school.boardingDay]} className="hover:text-primary">{t(breadcrumbKey[school.boardingDay])}</Link>
+        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+        <span>{school.name}</span>
+      </nav>
+
+      {/* Section tabs */}
+      <div className="wrap">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#dcdcdc]">
+          <div className="flex gap-6 overflow-x-auto scrollbar-hide">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => jumpTo(tab.id)}
+                className={`whitespace-nowrap border-b-[3px] pb-3 pt-2 text-[16px] transition ${
+                  activeTab === tab.id ? "border-primary text-primary" : "border-transparent text-foreground hover:text-primary"
+                }`}
+              >
+                {t(tab.key)}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4 pb-3">
+            {website && (
+              <a href={website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-[15px] text-teal hover:underline">
+                <Globe className="h-4 w-4" />
+                {website.replace("https://", "www.")}
+              </a>
+            )}
+            <span className="flex items-center gap-2 text-[#9a9a9a]">
+              <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" fill="currentColor">
+                <path d="M12 2a10 10 0 0 0-1.6 19.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 12 2Z" />
+              </svg>
+              <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" fill="currentColor">
+                <path d="M22.5 7.2a2.8 2.8 0 0 0-2-2C18.8 4.8 12 4.8 12 4.8s-6.8 0-8.5.4a2.8 2.8 0 0 0-2 2C1 8.9 1 12 1 12s0 3.1.5 4.8a2.8 2.8 0 0 0 2 2c1.7.4 8.5.4 8.5.4s6.8 0 8.5-.4a2.8 2.8 0 0 0 2-2c.5-1.7.5-4.8.5-4.8s0-3.1-.5-4.8ZM9.8 15.1V8.9l5.7 3.1-5.7 3.1Z" />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
       <section className="py-8">
-        <div className="container">
-          <Link to="/shule" className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-            <ArrowLeft className="h-4 w-4" /> Rudi kwenye Orodha
-          </Link>
+        <div className="wrap grid gap-6 lg:grid-cols-[minmax(0,1fr)_425px]">
+          <div className="space-y-6">
+            {/* Overview */}
+            <div id="muhtasari" className="scroll-mt-24 rounded-2xl bg-cream p-6 sm:p-8">
+              <h2 className="text-[28px] font-bold text-foreground sm:text-[34px]">
+                {t("profile.about")}{" "}
+                <span className="text-[15px] font-normal text-foreground">({school.levels.join(" · ")})</span>
+              </h2>
+              <p className="mt-4 text-[16px] leading-[1.7] text-foreground">{school.description}</p>
 
-          {/* Quick Stats Bar */}
-          <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-5 rounded-lg border bg-card p-4">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-primary">
-                <Star className="h-4 w-4 fill-primary" />
-                <span className="font-display text-xl font-bold">{school.rating}</span>
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+                {[
+                  { label: t("profile.stat.grade"), value: grade },
+                  { label: t("profile.stat.rating"), value: school.rating > 0 ? school.rating.toFixed(1) : "—" },
+                  { label: t("profile.stat.divisionOne"), value: `${perf.divisionI}%` },
+                  { label: t("profile.stat.type"), value: typeLabel },
+                  { label: t("profile.stat.gender"), value: genderLabel },
+                ].map((stat) => (
+                  <div key={stat.label} className="rounded-lg border border-[#e8e2cf] bg-card px-3 py-3 text-center">
+                    <p className="text-[18px] font-bold text-foreground">{stat.value}</p>
+                    <p className="mt-0.5 text-[12px] text-muted-foreground">{stat.label}</p>
+                  </div>
+                ))}
               </div>
-              <p className="text-xs text-muted-foreground">Rating</p>
             </div>
-            <div className="text-center">
-              <p className="font-display text-xl font-bold text-success">{perf.divisionI}%</p>
-              <p className="text-xs text-muted-foreground">Division I</p>
+
+            {/* Academic performance */}
+            <div id="matokeo" className="tile scroll-mt-24 p-6 sm:p-8">
+              <h2 className="flex items-center gap-2 text-[22px] font-bold text-foreground">
+                <TrendingUp className="h-5 w-5 text-primary" /> {t("profile.results")}
+              </h2>
+              <div className="mt-5 space-y-4">
+                {[
+                  { label: "Division I", value: perf.divisionI, color: "bg-success" },
+                  { label: "Division II", value: perf.divisionII, color: "bg-primary" },
+                  { label: "Division III", value: perf.divisionIII, color: "bg-gold" },
+                  { label: "Division IV", value: perf.divisionIV, color: "bg-muted-foreground" },
+                  { label: "Division 0", value: perf.division0, color: "bg-destructive" },
+                ].map((div) => (
+                  <div key={div.label}>
+                    <div className="flex items-center justify-between text-[15px]">
+                      <span className="text-foreground">{div.label}</span>
+                      <span className="font-bold text-foreground">{div.value}%</span>
+                    </div>
+                    <div className="mt-1.5 h-2.5 w-full rounded-full bg-muted">
+                      <div className={`h-2.5 rounded-full ${div.color} transition-all duration-500`} style={{ width: `${div.value}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="text-center">
-              <p className="font-display text-lg font-bold text-foreground">{school.boardingDay}</p>
-              <p className="text-xs text-muted-foreground">Aina</p>
+
+            {/* Facilities */}
+            <div id="vifaa" className="tile scroll-mt-24 p-6 sm:p-8">
+              <h2 className="flex items-center gap-2 text-[22px] font-bold text-foreground">
+                <Home className="h-5 w-5 text-primary" /> {t("profile.facilities")}
+              </h2>
+              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {school.facilities.map((f) => (
+                  <div key={f} className="flex items-center gap-2 rounded-lg bg-muted/60 px-3 py-2.5 text-[15px] text-foreground">
+                    <CheckCircle className="h-4 w-4 text-success" /> {f}
+                  </div>
+                ))}
+                {school.facilities.length === 0 && <p className="text-[15px] text-muted-foreground">{t("profile.facilitiesEmpty")}</p>}
+              </div>
             </div>
-            <div className="text-center">
-              <p className="font-display text-lg font-bold text-foreground">{school.gender}</p>
-              <p className="text-xs text-muted-foreground">Jinsia</p>
+
+            {/* Programs */}
+            <div id="programu" className="tile scroll-mt-24 p-6 sm:p-8">
+              <h2 className="text-[22px] font-bold text-foreground">{t("profile.programs")}</h2>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {school.programs.map((p) => (
+                  <span key={p} className="flex items-center gap-1.5 rounded-md border border-[#cfcfcf] px-3 py-1.5 text-[15px] text-foreground">
+                    <CheckCircle className="h-3.5 w-3.5 text-primary" /> {p}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="text-center col-span-2 md:col-span-1">
-              <p className="font-display text-lg font-bold text-foreground">{school.levels.join(" / ")}</p>
-              <p className="text-xs text-muted-foreground">Level</p>
+
+            {/* Photos placeholder */}
+            <div className="tile p-6 sm:p-8">
+              <h2 className="flex items-center gap-2 text-[22px] font-bold text-foreground">
+                <Camera className="h-5 w-5 text-primary" /> {t("profile.photos")}
+              </h2>
+              <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3">
+                {photoKeys.map((key) => (
+                  <div key={key} className="flex aspect-video items-center justify-center rounded-lg bg-muted text-[14px] text-muted-foreground">
+                    <div className="text-center">
+                      <Camera className="mx-auto mb-1 h-6 w-6" />
+                      {t(key)}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-3">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* 1. Overview */}
-              <div className="rounded-lg border bg-card p-6">
-                <h2 className="font-display text-xl font-semibold text-foreground">Kuhusu Shule</h2>
-                <p className="mt-3 text-muted-foreground leading-relaxed">{school.description}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {school.levels.map((l) => (
-                    <span key={l} className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">{l}</span>
-                  ))}
-                  <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{school.boardingDay}</span>
-                  <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{school.gender}</span>
-                </div>
+          {/* Sidebar */}
+          <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+            {/* Contact */}
+            <div id="mawasiliano" className="tile scroll-mt-24 p-6 sm:p-8">
+              <h3 className="text-[19px] font-bold text-foreground">{t("profile.contactTitle", { name: school.name })}</h3>
+
+              <div className="mt-5 flex items-center gap-4">
+                <img src={school.image} alt="" className="h-12 w-12 rounded-full object-cover" />
+                <span className="text-[16px] text-foreground">{t("profile.admissionsOfficer")}</span>
               </div>
 
-              {/* 2. Academic Performance */}
-              <div className="rounded-lg border bg-card p-6">
-                <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-foreground">
-                  <TrendingUp className="h-5 w-5 text-primary" /> Matokeo ya Mitihani
-                </h2>
-                <div className="mt-4 space-y-4">
-                  {[
-                    { label: "Division I", value: perf.divisionI, color: "bg-success" },
-                    { label: "Division II", value: perf.divisionII, color: "bg-primary" },
-                    { label: "Division III", value: perf.divisionIII, color: "bg-accent" },
-                    { label: "Division IV", value: perf.divisionIV, color: "bg-muted-foreground" },
-                    { label: "Division 0", value: perf.division0, color: "bg-destructive" },
-                  ].map((div) => (
-                    <div key={div.label}>
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-foreground">{div.label}</span>
-                        <span className="font-bold text-foreground">{div.value}%</span>
-                      </div>
-                      <div className="mt-1 h-2.5 w-full rounded-full bg-muted">
-                        <div
-                          className={`h-2.5 rounded-full ${div.color} transition-all duration-500`}
-                          style={{ width: `${div.value}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="mt-5 block">
+                <Button className="h-[52px] w-full gap-2 rounded-lg text-[16px] font-semibold" size="lg">
+                  <MessageSquare className="h-4 w-4" /> {t("profile.sendMessage")}
+                </Button>
+              </a>
+              <Link to="/omba-nafasi" className="mt-3 block">
+                <Button variant="outline" className="h-[52px] w-full rounded-lg text-[16px] font-semibold" size="lg">
+                  {t("profile.apply")}
+                </Button>
+              </Link>
 
-              {/* 3. Facilities */}
-              <div className="rounded-lg border bg-card p-6">
-                <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-foreground">
-                  <Home className="h-5 w-5 text-primary" /> Vifaa na Mazingira
-                </h2>
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  {school.facilities.map((f) => (
-                    <div key={f} className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-foreground">
-                      <CheckCircle className="h-4 w-4 text-success" /> {f}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 4. Programs */}
-              <div className="rounded-lg border bg-card p-6">
-                <h2 className="font-display text-xl font-semibold text-foreground">Programu za Masomo</h2>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {school.programs.map((p) => (
-                    <span key={p} className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
-                      <CheckCircle className="h-3.5 w-3.5" /> {p}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* 5. Photos placeholder */}
-              <div className="rounded-lg border bg-card p-6">
-                <h2 className="flex items-center gap-2 font-display text-xl font-semibold text-foreground">
-                  <Camera className="h-5 w-5 text-primary" /> Picha za Shule
-                </h2>
-                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {["Campus", "Madarasa", "Maabara", "Bweni", "Michezo", "Maktaba"].map((label) => (
-                    <div key={label} className="flex aspect-video items-center justify-center rounded-lg bg-muted text-sm text-muted-foreground">
-                      <div className="text-center">
-                        <Camera className="mx-auto h-6 w-6 mb-1" />
-                        {label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-4">
-              <div className="sticky top-20 space-y-4">
-                {/* Fees Structure */}
-                <div className="rounded-lg border bg-card p-6">
-                  <h3 className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
-                    <DollarSign className="h-5 w-5 text-primary" /> Ada za Shule
-                  </h3>
-                  <div className="mt-4 space-y-3">
-                    {school.feesStructure.boarding && (
-                      <div className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2">
-                        <span className="text-sm text-muted-foreground">Boarding</span>
-                        <span className="font-semibold text-foreground">{formatTZS(school.feesStructure.boarding)}</span>
-                      </div>
-                    )}
-                    {school.feesStructure.day && (
-                      <div className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2">
-                        <span className="text-sm text-muted-foreground">Day</span>
-                        <span className="font-semibold text-foreground">{formatTZS(school.feesStructure.day)}</span>
-                      </div>
-                    )}
-                    <div className="border-t pt-3">
-                      <p className="text-xs text-muted-foreground">Ada kwa mwaka (2026)</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 space-y-2">
-                    <Link to="/omba-nafasi" className="block">
-                      <Button
-                        className="w-full bg-cta hover:bg-cta/90 text-cta-foreground"
-                        size="lg"
-                      >
-                        Omba Nafasi
-                      </Button>
-                    </Link>
-                    <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="block">
-                      <Button variant="outline" className="w-full gap-2 border-green-500/30 text-green-600 hover:bg-green-50 hover:text-green-700" size="lg">
-                        <MessageSquare className="h-4 w-4" /> WhatsApp Shule
-                      </Button>
+              <div className="mt-6 border-t border-[#ededed] pt-5">
+                {contactRevealed ? (
+                  <div className="space-y-3 text-[15px] text-foreground">
+                    <a href={`tel:${school.phone}`} className="flex items-center gap-2 transition-colors hover:text-primary">
+                      <Phone className="h-4 w-4 text-primary" /> {school.phone}
                     </a>
+                    <a href={`mailto:${school.email}`} className="flex items-center gap-2 transition-colors hover:text-primary">
+                      <Mail className="h-4 w-4 text-primary" /> {school.email}
+                    </a>
+                    <p className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary" /> {school.location}
+                    </p>
                   </div>
-                </div>
-
-                {/* Contact — Soft Gate */}
-                <div className="rounded-lg border bg-card p-6">
-                  <h3 className="font-display text-lg font-semibold text-foreground">Mawasiliano</h3>
-                  {contactRevealed ? (
-                    <div className="mt-3 space-y-3 text-sm text-muted-foreground">
-                      <a href={`tel:${school.phone}`} className="flex items-center gap-2 hover:text-primary transition-colors">
-                        <Phone className="h-4 w-4 text-primary" /> {school.phone}
-                      </a>
-                      <a href={`mailto:${school.email}`} className="flex items-center gap-2 hover:text-primary transition-colors">
-                        <Mail className="h-4 w-4 text-primary" /> {school.email}
-                      </a>
-                      <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> {school.location}</p>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-[15px] text-foreground">
+                      <Phone className="h-4 w-4 text-primary" />
+                      <span className="select-none blur-sm">+255 7XX XXX XXX</span>
                     </div>
-                  ) : (
-                    <div className="mt-3 space-y-3">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Phone className="h-4 w-4 text-primary" />
-                        <span className="select-none blur-sm">+255 7XX XXX XXX</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Mail className="h-4 w-4 text-primary" />
-                        <span className="select-none blur-sm">info@school.ac.tz</span>
-                      </div>
-                      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4 text-primary" /> {school.location}
-                      </p>
-                      <Button
-                        onClick={handleRevealContact}
-                        variant="outline"
-                        className="mt-2 w-full gap-2"
-                        size="sm"
-                      >
-                        <Lock className="h-3.5 w-3.5" /> Bonyeza kuona mawasiliano
-                      </Button>
+                    <div className="flex items-center gap-2 text-[15px] text-foreground">
+                      <Mail className="h-4 w-4 text-primary" />
+                      <span className="select-none blur-sm">info@school.ac.tz</span>
                     </div>
-                  )}
-                </div>
-
-                {/* Upsell CTA - always visible */}
-                <div
-                  className="rounded-lg border-2 border-primary/30 bg-primary/5 p-5 cursor-pointer hover:shadow-md transition-all"
-                  onClick={() => navigate("/omba-nafasi")}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    <h3 className="font-display text-sm font-bold text-foreground uppercase">
-                      Je, hii ndio shule inayolingana na vigezo vyako?
-                    </h3>
+                    <p className="flex items-center gap-2 text-[15px] text-foreground">
+                      <MapPin className="h-4 w-4 text-primary" /> {school.location}
+                    </p>
+                    <Button onClick={handleRevealContact} variant="outline" className="mt-2 w-full gap-2 rounded-lg" size="sm">
+                      <Lock className="h-3.5 w-3.5" /> {t("profile.revealContact")}
+                    </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Tunakuchagulia shule bora kulingana na bajeti, eneo na mahitaji ya mtoto wako.
-                  </p>
-                  <Button size="sm" className="w-full gap-1 text-xs mt-3">
-                    🚀 Pata Sasa Hivi
-                  </Button>
-                </div>
+                )}
               </div>
             </div>
-          </div>
+
+            {/* Fees */}
+            <div id="ada" className="tile scroll-mt-24 p-6 sm:p-8">
+              <h3 className="flex items-center gap-2 text-[19px] font-bold text-foreground">
+                <MoneyBag className="h-5 w-5" /> {t("profile.feesTitle")}
+              </h3>
+              <p className="mt-1 text-[15px] text-foreground">
+                {t("profile.feesPerYear", { range: feeRange(school.tuitionMin, school.tuitionMax) })}
+              </p>
+              <div className="mt-4 space-y-2">
+                {school.feesStructure.boarding && (
+                  <div className="flex items-center justify-between rounded-lg bg-muted/60 px-3 py-2.5">
+                    <span className="text-[15px] text-foreground">{t("profile.fees.boarding")}</span>
+                    <span className="font-semibold text-foreground">{formatTZS(school.feesStructure.boarding)}</span>
+                  </div>
+                )}
+                {school.feesStructure.day && (
+                  <div className="flex items-center justify-between rounded-lg bg-muted/60 px-3 py-2.5">
+                    <span className="text-[15px] text-foreground">{t("profile.fees.day")}</span>
+                    <span className="font-semibold text-foreground">{formatTZS(school.feesStructure.day)}</span>
+                  </div>
+                )}
+                {school.feesStructure.otherContributions > 0 && (
+                  <div className="flex items-center justify-between rounded-lg bg-muted/60 px-3 py-2.5">
+                    <span className="text-[15px] text-foreground">{t("profile.fees.other")}</span>
+                    <span className="font-semibold text-foreground">{formatTZS(school.feesStructure.otherContributions)}</span>
+                  </div>
+                )}
+                <p className="pt-2 text-[12px] text-muted-foreground">{t("profile.feesNote", { year: new Date().getFullYear() })}</p>
+              </div>
+            </div>
+
+            {/* Upsell CTA - always visible */}
+            <div
+              className="cursor-pointer rounded-2xl border-2 border-primary/30 bg-primary/5 p-5 transition-all hover:shadow-md"
+              onClick={() => navigate("/omba-nafasi")}
+            >
+              <div className="mb-2 flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <h3 className="text-[14px] font-bold uppercase text-foreground">{t("profile.upsellTitle")}</h3>
+              </div>
+              <p className="text-[13px] leading-relaxed text-foreground">{t("profile.upsellBody")}</p>
+              <Button size="sm" className="mt-3 w-full gap-1 rounded-lg text-[13px]">
+                {t("profile.upsellCta")}
+              </Button>
+            </div>
+          </aside>
         </div>
       </section>
 
       {/* Timed Upsell Dialog - compact */}
       <Dialog open={showUpsell} onOpenChange={setShowUpsell}>
-        <DialogContent className="max-w-xs p-4 rounded-2xl">
-          <DialogHeader className="text-center space-y-1">
+        <DialogContent className="max-w-xs rounded-2xl p-4">
+          <DialogHeader className="space-y-1 text-center">
             <DialogTitle className="flex flex-col items-center gap-1 text-sm font-bold uppercase">
               <Sparkles className="h-5 w-5 text-primary" />
-              Je, Unatafuta Shule Bora?
+              {t("profile.upsellDialogTitle")}
             </DialogTitle>
-            <DialogDescription className="text-xs leading-relaxed">
-              Tunaweza kukuchagulia shule 3 bora kulingana na bajeti yako ndani ya dakika chache.
-            </DialogDescription>
+            <DialogDescription className="text-xs leading-relaxed">{t("profile.upsellDialogBody")}</DialogDescription>
           </DialogHeader>
           <Button
-            className="w-full bg-cta hover:bg-cta/90 text-cta-foreground font-bold text-sm"
+            className="w-full bg-cta text-sm font-bold text-cta-foreground hover:bg-cta/90"
             size="sm"
             onClick={() => {
               setShowUpsell(false);
               navigate("/omba-nafasi");
             }}
           >
-            🚀 Pata Sasa Hivi
+            {t("profile.upsellCta")}
           </Button>
         </DialogContent>
       </Dialog>
 
       {/* Paywall from sidebar CTA */}
-      <PaywallDialog
-        open={showPaywall}
-        onOpenChange={setShowPaywall}
-      />
+      <PaywallDialog open={showPaywall} onOpenChange={setShowPaywall} />
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
 
       <Footer />
     </div>

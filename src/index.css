@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,88 +6,97 @@
 
 @layer base {
   :root {
-    /* Editorial light-grey canvas, white cards, one deep crimson accent. */
-    --background: 40 14% 96%;
-    --foreground: 0 0% 8%;
+    /* White canvas, near-black type, one crimson accent. */
+    --background: 0 0% 100%;
+    --foreground: 210 11% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
+    --card-foreground: 210 11% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
+    --popover-foreground: 210 11% 15%;
 
-    --primary: 347 72% 40%;
+    --primary: 352 62% 43%;
     --primary-foreground: 0 0% 100%;
 
     /* The near-black used by the search bar and dark panels. */
     --secondary: 0 0% 7%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 40 10% 92%;
-    --muted-foreground: 0 0% 42%;
+    --muted: 0 0% 94%;
+    --muted-foreground: 208 7% 46%;
 
-    --accent: 347 72% 40%;
+    --accent: 352 62% 43%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 46%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 8% 88%;
-    --input: 40 8% 88%;
-    --ring: 347 72% 40%;
+    --border: 0 0% 87%;
+    --input: 0 0% 87%;
+    --ring: 352 62% 43%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 8%;
-    --sidebar-primary: 347 72% 40%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 40 10% 94%;
-    --sidebar-accent-foreground: 0 0% 8%;
-    --sidebar-border: 40 8% 88%;
-    --sidebar-ring: 347 72% 40%;
+    /* Supporting colours: "recommended" starburst, "new" ribbon, cream panel, footer. */
+    --teal: 172 62% 44%;
+    --gold: 38 76% 57%;
+    --cream: 45 80% 96%;
+    --footer: 0 0% 94%;
 
-    --hero-gradient: linear-gradient(135deg, hsl(0, 0%, 9%) 0%, hsl(347, 60%, 22%) 100%);
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 210 11% 15%;
+    --sidebar-primary: 352 62% 43%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 210 11% 15%;
+    --sidebar-border: 0 0% 87%;
+    --sidebar-ring: 352 62% 43%;
+
+    --hero-gradient: linear-gradient(135deg, hsl(0, 0%, 9%) 0%, hsl(352, 60%, 24%) 100%);
     --success: 152 45% 30%;
     --success-foreground: 0 0% 100%;
-    --warm-bg: 40 14% 96%;
-    --warm-bg-darker: 40 12% 92%;
-    --cta: 347 72% 40%;
+    --warm-bg: 0 0% 97%;
+    --warm-bg-darker: 0 0% 94%;
+    --cta: 352 62% 43%;
     --cta-foreground: 0 0% 100%;
 
-    --font-display: 'Plus Jakarta Sans', sans-serif;
-    --font-body: 'Inter', sans-serif;
+    /* One family everywhere; Segoe UI on Windows, Open Sans elsewhere. */
+    --font-body: "Segoe UI", system-ui, -apple-system, "Open Sans", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-display: var(--font-body);
   }
 
   .dark {
     --background: 0 0% 7%;
-    --foreground: 40 10% 94%;
+    --foreground: 0 0% 94%;
     --card: 0 0% 11%;
-    --card-foreground: 40 10% 94%;
+    --card-foreground: 0 0% 94%;
     --popover: 0 0% 11%;
-    --popover-foreground: 40 10% 94%;
-    --primary: 347 72% 52%;
+    --popover-foreground: 0 0% 94%;
+    --primary: 352 62% 52%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 8%;
     --muted: 0 0% 16%;
     --muted-foreground: 0 0% 64%;
-    --accent: 347 72% 52%;
+    --accent: 352 62% 52%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62% 40%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 347 72% 52%;
+    --ring: 352 62% 52%;
+    --cream: 40 20% 14%;
+    --footer: 0 0% 10%;
     --sidebar-background: 0 0% 9%;
-    --sidebar-foreground: 40 10% 94%;
-    --sidebar-primary: 347 72% 52%;
+    --sidebar-foreground: 0 0% 94%;
+    --sidebar-primary: 352 62% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 14%;
-    --sidebar-accent-foreground: 40 10% 94%;
+    --sidebar-accent-foreground: 0 0% 94%;
     --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 347 72% 52%;
-    --hero-gradient: linear-gradient(135deg, hsl(0, 0%, 6%) 0%, hsl(347, 50%, 18%) 100%);
+    --sidebar-ring: 352 62% 52%;
+    --hero-gradient: linear-gradient(135deg, hsl(0, 0%, 6%) 0%, hsl(352, 50%, 18%) 100%);
     --warm-bg: 0 0% 9%;
     --warm-bg-darker: 0 0% 12%;
   }
@@ -106,10 +115,8 @@
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    @apply tracking-tight;
   }
 
-  /* The display face carries the page: tight tracking, heavy weight, short leading. */
   .font-display {
     font-family: var(--font-display);
   }
@@ -131,38 +138,48 @@
     background-clip: text;
   }
 
-  /* Editorial headline scale used by the hero and every section title. */
+  /* Page container: 1300px of content on a 16px gutter. */
+  .wrap {
+    @apply mx-auto w-full max-w-[1300px] px-4;
+  }
+
+  /* Headline scale — bold, tight, no letterspacing tricks. */
   .display-xl {
-    @apply font-display font-extrabold leading-[1.04] tracking-[-0.03em];
-    font-size: clamp(2.25rem, 6.2vw, 4.5rem);
+    @apply font-bold leading-[1.12] tracking-[-0.01em];
+    font-size: clamp(2.25rem, 5.2vw, 4rem);
   }
 
   .display-lg {
-    @apply font-display font-extrabold leading-[1.06] tracking-[-0.025em];
-    font-size: clamp(1.875rem, 4.4vw, 3.25rem);
+    @apply font-bold leading-[1.15];
+    font-size: clamp(1.875rem, 3.6vw, 3rem);
   }
 
   .display-md {
-    @apply font-display font-bold leading-[1.12] tracking-[-0.02em];
-    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    @apply font-bold leading-[1.2];
+    font-size: clamp(1.5rem, 2.6vw, 2.125rem);
   }
 
-  /* Small uppercase label sitting above a section title. */
+  /* Plain line that sits above a section title. */
   .eyebrow {
-    @apply text-[0.8125rem] font-medium text-muted-foreground;
+    @apply text-base text-foreground;
+  }
+
+  /* Card surface used for every tile on the site. */
+  .tile {
+    @apply overflow-hidden rounded-2xl bg-card shadow-[0_2px_10px_rgba(0,0,0,0.08)];
   }
 
   .card-hover {
-    @apply transition-all duration-300;
+    @apply transition-shadow duration-300;
   }
 
   .card-hover:hover {
-    @apply -translate-y-1 shadow-[0_18px_40px_-18px_rgba(0,0,0,0.35)];
+    @apply shadow-[0_10px_28px_rgba(0,0,0,0.14)];
   }
 
   /* Horizontal card rail: snaps card by card, hides its scrollbar. */
   .rail {
-    @apply flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-2;
+    @apply flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-2;
     scrollbar-width: none;
   }
 
@@ -176,7 +193,12 @@
 
   /* Text over photography stays readable without washing the image out. */
   .photo-scrim {
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.32) 42%, rgba(0, 0, 0, 0.05) 100%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.35) 38%, rgba(0, 0, 0, 0) 70%);
+  }
+
+  /* Dashed hairline used by the FAQ and the footer. */
+  .rule-dashed {
+    border-top: 1px dashed hsl(0 0% 40%);
   }
 }
 
